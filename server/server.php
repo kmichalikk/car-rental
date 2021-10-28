@@ -1,6 +1,7 @@
 <?php
 session_start();
 require_once "usermgmt.php";
+require_once "reservemgmt.php";
 
 header("Content-Type: application/json");
 if (isset($_POST["target"])) {
@@ -60,9 +61,63 @@ if (isset($_POST["target"])) {
 			}
 			break;
 		case "logout":
-			unset($_SESSION["loggedInUser"]);
+			logout();
 			echo (json_encode(["ok" => true]));
 			break;
+		case "requestcar":
+			if (isset($_SESSION["loggedInUser"])) {
+				if (isset($_POST["carid"]) && intval($_POST["carid"]) > 0 && isset($_POST["borrowtime"]) && intval($_POST["borrowtime"]) > 0) {
+					$requestStatus = tryRequestCar(intval($_POST["carid"]), $_SESSION["loggedInUser"]["id"], intval($_POST["borrowtime"]));
+					if ($requestStatus->status == "ok") {
+						echo (json_encode(["ok" => true]));
+					} else if ($requestStatus->status == "nonexistent") {
+						http_response_code(404);
+						echo (json_encode(["ok" => false, "msg" => "no such car"]));
+					} else if ($requestStatus->status == "booked") {
+						http_response_code(403);
+						echo (json_encode(["ok" => false, "msg" => "car already booked"]));
+					} else if ($requestStatus->status == "dbfail") {
+						http_response_code(500);
+						echo (json_encode(["ok" => false, "msg" => $requestStatus->additionalInfo]));
+					} else {
+						http_response_code(500);
+						echo (json_encode(["ok" => false, "msg" => "unknown error"]));
+					}
+				} else {
+					http_response_code(400);
+					echo (json_encode(["ok" => false, "msg" => "bad request: carid > 0 or borrowtime > 0 not specified"]));
+				}
+			} else {
+				http_response_code(401);
+				echo (json_encode(["ok" => false, "msg" => "you must be logged in to request cars"]));
+			}
+			break;
+		case "getcars":
+			$getResult = tryGetCars();
+			if ($getResult->status == "ok") {
+				echo (json_encode(["ok" => true, "data" => $getResult->additionalInfo]));
+			} else if ($getResult->status == "dbfail") {
+				http_response_code(500);
+				echo (json_encode(["ok" => false, "msg" => $getResult->additionalInfo]));
+			}
+			break;
+		case "mycars":
+			if (isset($_SESSION["loggedInUser"])) {
+				$getResult = tryGetUserCars($_SESSION["loggedInUser"]["id"]);
+				if ($getResult->status == "ok") {
+					echo (json_encode(["ok" => true, "data" => $getResult->additionalInfo]));
+				} else if ($getResult->status == "dbfail") {
+					http_response_code(500);
+					echo (json_encode(["ok" => false, "msg" => $getResult->additionalInfo]));
+				}
+			} else {
+				http_response_code(401);
+				echo (json_encode(["ok" => false, "msg" => "you must be logged in to request cars"]));
+			}
+			break;
+		default:
+			http_response_code(400);
+			echo (json_encode(["ok" => false, "msg" => "missing or wrong target"]));
 	}
 } else {
 	http_response_code(400);

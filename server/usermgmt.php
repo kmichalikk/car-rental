@@ -1,5 +1,6 @@
 <?php
 require_once "connect.php";
+require_once "utils.php";
 
 const ACCOUNT_ADMIN = 0;
 const ACCOUNT_USER = 1;
@@ -12,17 +13,6 @@ class User
 	{
 		$this->nick = $nick;
 		$this->type = $type;
-	}
-}
-
-class ReturnState
-{
-	public $status;
-	public $additionalInfo;
-	function __construct($status, $additionalInfo)
-	{
-		$this->status = $status;
-		$this->additionalInfo = $additionalInfo;
 	}
 }
 
@@ -63,4 +53,9 @@ function tryLogin($username, $pass)
 	} else {
 		return new ReturnState("dbfail", $conn->error);
 	}
+}
+
+function logout()
+{
+	unset($_SESSION["loggedInUser"]);
 }
