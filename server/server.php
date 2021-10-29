@@ -99,6 +99,9 @@ if (isset($_POST["target"])) {
 			} else if ($getResult->status == "dbfail") {
 				http_response_code(500);
 				echo (json_encode(["ok" => false, "msg" => $getResult->additionalInfo]));
+			} else {
+				http_response_code(500);
+				echo (json_encode(["ok" => false, "msg" => "unknown error"]));
 			}
 			break;
 		case "mycars":
@@ -109,10 +112,55 @@ if (isset($_POST["target"])) {
 				} else if ($getResult->status == "dbfail") {
 					http_response_code(500);
 					echo (json_encode(["ok" => false, "msg" => $getResult->additionalInfo]));
+				} else {
+					http_response_code(500);
+					echo (json_encode(["ok" => false, "msg" => "unknown error"]));
 				}
 			} else {
 				http_response_code(401);
 				echo (json_encode(["ok" => false, "msg" => "you must be logged in to request cars"]));
+			}
+			break;
+		case "getrequests":
+			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
+				$getRequests = tryGetRequests();
+				if ($getRequests->status == "ok") {
+					echo (json_encode($getRequests->additionalInfo));
+				} else if ($getRequests->status == "dbfail") {
+					http_response_code(500);
+					echo (json_encode(["ok" => false, "msg" => $getRequests->additionalInfo]));
+				} else {
+					http_response_code(500);
+					echo (json_encode(["ok" => false, "msg" => "unknown error"]));
+				}
+			} else {
+				http_response_code(401);
+				echo (json_encode(["ok" => false, "msg" => "you must be logged as admin to accept requests"]));
+			}
+			break;
+		case "acceptrequest":
+			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
+				if (isset($_POST["reqid"]) && intval($_POST["reqid"]) > 0 && isset($_POST["borrowtime"]) && intval($_POST["borrowtime"]) > 0) {
+					$acceptResult = tryAcceptRequest($_POST["reqid"], $_POST["borrowtime"]);
+					if ($acceptResult->status == "ok") {
+						echo (json_encode(["ok" => true]));
+					} else if ($acceptResult->status == "nonexistent") {
+						http_response_code(404);
+						echo (json_encode(["ok" => false, "msg" => "no such request"]));
+					} else if ($acceptResult->status == "dbfail") {
+						http_response_code(500);
+						echo (json_encode(["ok" => false, "msg" => $acceptResult->additionalInfo]));
+					} else {
+						http_response_code(500);
+						echo (json_encode(["ok" => false, "msg" => "unknown error"]));
+					}
+				} else {
+					http_response_code(400);
+					echo (json_encode(["ok" => false, "msg" => "bad request: missing reqid > 0 and/or borrowtime > 0"]));
+				}
+			} else {
+				http_response_code(401);
+				echo (json_encode(["ok" => false, "msg" => "you must be logged as admin to accept requests"]));
 			}
 			break;
 		default:
