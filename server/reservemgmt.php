@@ -51,7 +51,7 @@ function tryGetCars()
 		}
 		$parsed = [];
 		foreach (array_keys($cars) as $key) {
-			$parsed[] = ["id" => $key, "booked" => $cars[$key]["booked"], "requestCount" => $cars[$key]["requestCount"]];
+			$parsed[] = ["id" => $key, "booked" => $cars[$key]["booked"], "requestCount" => $cars[$key]["requestCount"], "url" => $cars[$key]["url"]];
 		}
 		return new ReturnState("ok", $parsed);
 	} else {

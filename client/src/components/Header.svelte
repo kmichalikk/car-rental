@@ -1,6 +1,34 @@
 <script>
+	import { writable } from "svelte/store";
+	import Button from "./Button.svelte";
+	import Logo from "./Logo.svelte";
+	export let loggedIn = false;
 </script>
 
 <header class="absolute top-0 min-w-full">
-	<div class="my-6 mx-6 rounded-lg shadow-lg py-4 px-8 bg-white">header</div>
+	<div class="my-6 mx-6 rounded-lg shadow-lg h-14 px-4 bg-white flex items-center justify-between">
+		<div class="flex items-center">
+			<Logo /><span class="text-lg text-purple-700 font-bold pl-8 hidden sm:inline">Rent'n'Drive</span>
+		</div>
+		{#if loggedIn}
+			witaj, xyz
+		{:else}
+			<div>
+				<Button
+					clickFn={() => {
+						alert("login");
+					}}
+					text="Zaloguj się"
+				/>
+				<span class="hidden sm:inline">lub</span>
+				<Button
+					clickFn={() => {
+						alert("rejestracja");
+					}}
+					text="Zarejestruj się"
+					class="hidden sm:inline-block"
+				/>
+			</div>
+		{/if}
+	</div>
 </header>
