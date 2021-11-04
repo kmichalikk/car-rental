@@ -34,7 +34,8 @@ function tryRequestCar($carID, $userID, $borrowTime)
 function tryGetCars()
 {
 	global $conn;
-	$query = $conn->query("select cars.ID, curr_booked.userID as booked, pending_requests.userID as requested
+	$query = $conn->query("select cars.ID, curr_booked.userID as booked, pending_requests.userID as requested,
+	 cars.img_url as url
 	 from cars left join curr_booked on curr_booked.carID = cars.ID
 	 left join pending_requests on pending_requests.carID = cars.ID;");
 	if ($query) {
@@ -42,7 +43,7 @@ function tryGetCars()
 		$data = $query->fetch_all();
 		foreach ($data as $row) {
 			if (!isset($cars[$row[0]]))
-				$cars[$row[0]] = ["booked" => false, "requestCount" => 0];
+				$cars[$row[0]] = ["booked" => false, "requestCount" => 0, "url" => $row[3]];
 			if ($row[1] != NULL)
 				$cars[$row[0]]["booked"] = true;
 			if ($row[2] != NULL)

@@ -1,7 +1,8 @@
 <script>
+	export let color = "white";
 </script>
 
-<div class="w-36 h-15 inline-block">
+<div class="w-36 h-15 inline-block" style="--color:{color}">
 	<svg
 		width="144"
 		height="60"
@@ -72,7 +73,7 @@
 	}
 
 	path {
-		stroke: #6d28d9;
+		stroke: var(--color);
 	}
 
 	#car-window-front {

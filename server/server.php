@@ -4,6 +4,7 @@ require_once "usermgmt.php";
 require_once "reservemgmt.php";
 
 header("Content-Type: application/json");
+header("Access-Control-Allow-Origin: *");
 if (isset($_POST["target"])) {
 	switch ($_POST["target"]) {
 		case "register":
@@ -93,6 +94,7 @@ if (isset($_POST["target"])) {
 			}
 			break;
 		case "getcars":
+			sleep(random_int(0, 5));
 			$getResult = tryGetCars();
 			if ($getResult->status == "ok") {
 				echo (json_encode(["ok" => true, "data" => $getResult->additionalInfo]));
