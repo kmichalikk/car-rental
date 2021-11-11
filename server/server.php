@@ -7,6 +7,12 @@ header("Content-Type: application/json");
 header("Access-Control-Allow-Origin: *");
 if (isset($_POST["target"])) {
 	switch ($_POST["target"]) {
+		case "hello":
+			if (isset($_SESSION["loggedInUser"]))
+				echo json_encode(["ok" => true, "nick" => $_SESSION["loggedInUser"]["nick"], "type" => $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN ? "admin" : "user"]);
+			else
+				echo json_encode(["ok" => false]);
+			break;
 		case "register":
 			if (
 				isset($_POST["nick"])

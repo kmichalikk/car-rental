@@ -1,9 +1,8 @@
 <script>
-	import { writable } from "svelte/store";
+	import { user } from "../stores";
 	import { push } from "svelte-spa-router";
 	import Button from "./Button.svelte";
 	import Logo from "./Logo.svelte";
-	export let loggedIn = false;
 </script>
 
 <header class="absolute top-0 min-w-full">
@@ -11,8 +10,13 @@
 		<div class="flex items-center cursor-pointer" on:click={() => push("/")}>
 			<Logo /><span class="text-lg text-purple-700 font-bold pl-8 hidden sm:inline">Rent'n'Drive</span>
 		</div>
-		{#if loggedIn}
-			witaj, xyz
+		{#if $user.loggedIn}
+			<Button
+				clickFn={() => {
+					push("/dashboard");
+				}}
+				text={$user.nick}
+			/>
 		{:else}
 			<div>
 				<Button

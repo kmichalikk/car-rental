@@ -1,17 +1,28 @@
 <script>
+	import { user } from "./stores";
 	import Router from "svelte-spa-router";
 	import Header from "./components/Header.svelte";
 	import Main from "./components/Main.svelte";
 	import NotFound from "./components/NotFound.svelte";
 	import Login from "./components/Login.svelte";
 	import Register from "./components/Register.svelte";
+	import Dashboard from "./components/Dashboard.svelte";
 
 	const routes = {
 		"/": Main,
 		"/login": Login,
 		"/register": Register,
+		"/dashboard": Dashboard,
 		"*": NotFound,
 	};
+	let fd = new FormData();
+	fd.append("target", "hello");
+	fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+		.then((res) => res.json())
+		.then((data) => {
+			if (data.ok) user.set({ loggedIn: true, nick: data.nick });
+		})
+		.catch((err) => console.log(err));
 </script>
 
 <Router {routes} />
@@ -22,6 +33,9 @@
 	@tailwind components;
 	@tailwind utilities;
 	:global(body) {
-		@apply bg-purple-700;
+		@apply bg-purple-700 h-full m-0 p-0;
+	}
+	:global(html) {
+		@apply h-full m-0 p-0;
 	}
 </style>
