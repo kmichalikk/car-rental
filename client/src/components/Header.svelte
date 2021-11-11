@@ -1,5 +1,6 @@
 <script>
 	import { writable } from "svelte/store";
+	import { push } from "svelte-spa-router";
 	import Button from "./Button.svelte";
 	import Logo from "./Logo.svelte";
 	export let loggedIn = false;
@@ -7,7 +8,7 @@
 
 <header class="absolute top-0 min-w-full">
 	<div class="my-6 mx-6 rounded-lg shadow-lg h-14 px-4 bg-white flex items-center justify-between">
-		<div class="flex items-center">
+		<div class="flex items-center cursor-pointer" on:click={() => push("/")}>
 			<Logo /><span class="text-lg text-purple-700 font-bold pl-8 hidden sm:inline">Rent'n'Drive</span>
 		</div>
 		{#if loggedIn}
@@ -16,14 +17,14 @@
 			<div>
 				<Button
 					clickFn={() => {
-						alert("login");
+						push("/login");
 					}}
 					text="Zaloguj się"
 				/>
 				<span class="hidden sm:inline">lub</span>
 				<Button
 					clickFn={() => {
-						alert("rejestracja");
+						push("/register");
 					}}
 					text="Zarejestruj się"
 					class="hidden sm:inline-block"

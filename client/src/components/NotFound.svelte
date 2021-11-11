@@ -1,0 +1,90 @@
+<script>
+	let targetX = 0;
+	let currX = 0;
+	let backwards = false;
+	let windowWidth = window.innerWidth;
+	let mouseFollowFunc = () => {};
+	setTimeout(() => {
+		mouseFollowFunc = (e) => {
+			targetX = e.clientX - windowWidth / 2;
+		};
+	}, 2000);
+	let time = performance.now();
+	let smoothDrive = (timeNow) => {
+		let delta = timeNow - time;
+		time = timeNow;
+		if (Math.abs(targetX) < windowWidth / 2) currX = currX + (targetX - currX) * 0.001 * delta;
+		if (currX > targetX) backwards = true;
+		else backwards = false;
+		requestAnimationFrame(smoothDrive);
+	};
+	requestAnimationFrame(smoothDrive);
+</script>
+
+<svelte:window bind:innerWidth={windowWidth} />
+<div class="h-screen w-screen flex flex-col items-center justify-center pb-32" on:mousemove={mouseFollowFunc}>
+	<h1 class="text-8xl m-8 text-white">404</h1>
+	<div style="transform: translate({currX}px, 0); stroke: white">
+		<svg
+			width="96"
+			height="40"
+			viewBox="0 0 24 10"
+			preserveAspectRatio="xMidYMin"
+			style="transform: scale({backwards ? -1 : 1}, 1); "
+		>
+			<path
+				style="fill:none;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
+				d="m 11.040951,0.9642675 h 4.929364 l 1.370144,2.480313 -5.259151,0.02128 -0.715303,-1.5955"
+				id="car-window-front"
+				sodipodi:nodetypes="ccccc"
+			/>
+			<path
+				style="fill:none;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
+				d="m 12.443141,4.3007525 10.125672,0.01603 0.01452,2.810632 h -7.000465 v -1.880459"
+				id="car-body-front"
+				sodipodi:nodetypes="ccccc"
+			/>
+			<path
+				style="fill:none;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
+				d="m 14.595872,7.1454285 -1.086248,-0.02453 c -0.276038,-0.834774 -0.732343,-1.322426 -1.434964,-1.339222 -0.889997,-0.01421 -1.366626,0.738872 -1.533753,1.354089 L 6.0631755,7.0989885 C 5.9042339,6.3547075 5.4412239,5.7668155 4.6317896,5.7622875 3.7123809,5.7584565 3.2952787,6.5324195 3.1785089,7.0894005 L 1.416667,7.1024405 1.441445,4.3167765 H 4.0402567 L 5.675074,0.9642685 h 4.389456"
+				id="car-body-back"
+				sodipodi:nodetypes="cccccccccccc"
+			/>
+			<path
+				style="fill:none;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
+				d="m 5.0497958,4.3167805 1.2297234,-2.458266 h 1.4012646 l 0.0064,2.458267 H 6.0095495"
+				id="car-window-1"
+				sodipodi:nodetypes="ccccc"
+			/>
+			<path
+				style="fill:none;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-opacity:1"
+				d="m 8.5594839,4.3167805 -0.02112,-2.458266 h 1.7516231 l 1.061299,2.458267 H 9.4050519"
+				id="car-window-2"
+				sodipodi:nodetypes="ccccc"
+			/>
+			<path
+				id="car-headlamp-1"
+				style="fill:#cccccc;fill-opacity:0;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;"
+				d="m 17.595814,5.6974695 a 0.55758486,0.55758486 0 0 1 -0.557586,0.557585 0.55758486,0.55758486 0 0 1 -0.557583,-0.557585 0.55758486,0.55758486 0 0 1 0.557583,-0.557585 0.55758486,0.55758486 0 0 1 0.557586,0.557585 z"
+			/>
+			<path
+				id="car-headlamp-2"
+				style="fill:#cccccc;fill-opacity:0;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;"
+				d="m 21.694115,5.6974695 a 0.55758486,0.55758486 0 0 1 -0.557585,0.557585 0.55758486,0.55758486 0 0 1 -0.557583,-0.557585 0.55758486,0.55758486 0 0 1 0.557583,-0.557585 0.55758486,0.55758486 0 0 1 0.557585,0.557585 z"
+			/>
+			<path
+				id="car-wheel-back"
+				style="fill:#cccccc;fill-opacity:0;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;"
+				d="M 5.3758788,7.8075935 A 0.7590323,1.2281402 0 0 1 4.6168466,9.0357325 0.7590323,1.2281402 0 0 1 3.8578141,7.8075935 0.7590323,1.2281402 0 0 1 4.6168466,6.5794515 0.7590323,1.2281402 0 0 1 5.3758788,7.8075935 Z"
+			/>
+			<path
+				id="car-wheel-front"
+				style="fill:#cccccc;fill-opacity:0;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;"
+				d="m 12.798858,7.8075935 a 0.7590323,1.2281402 0 0 1 -0.759032,1.228139 0.7590323,1.2281402 0 0 1 -0.759033,-1.228139 0.7590323,1.2281402 0 0 1 0.759033,-1.228142 0.7590323,1.2281402 0 0 1 0.759032,1.228142 z"
+			/>
+		</svg>
+	</div>
+
+	<div class="w-5/6 border-t-4 border-white pb-8" />
+	<div class="font-semibold text-2xl text-white">Nie znaleźliśmy tego, co szukasz</div>
+</div>

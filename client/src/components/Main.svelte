@@ -50,7 +50,7 @@
 	window.requestAnimationFrame(scrollSmoothly);
 </script>
 
-<main class="bg-purple-700 w-screen h-screen py-28 flex flex-column flex-wrap justify-center overflow-visible">
+<main class="w-screen h-screen py-28 flex flex-column flex-wrap justify-center overflow-visible">
 	<div
 		class="fixed h-full"
 		on:wheel={mouseScrollHandler}

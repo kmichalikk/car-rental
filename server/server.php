@@ -8,7 +8,19 @@ header("Access-Control-Allow-Origin: *");
 if (isset($_POST["target"])) {
 	switch ($_POST["target"]) {
 		case "register":
-			if (isset($_POST["nick"]) && isset($_POST["password"]) && isset($_POST["email"]) && isset($_POST["type"])) {
+			if (
+				isset($_POST["nick"])
+				&& false
+				&& isset($_POST["password"])
+				&& strlen($_POST["password"]) >= 8
+				&& preg_match('/.*[a-z].*/', $_POST["password"])
+				&& preg_match('/.*[0-9].*/', $_POST["password"])
+				&& preg_match('/.*[A-Z].*/', $_POST["password"])
+				&& preg_match('/.*[`~!@#$%^&*()\-_=+;:\'"\[\]\{\}\\|,\.<>\/?].*/', $_POST["password"])
+				&& isset($_POST["email"])
+				&& preg_match('/[\w\.-]+@[\w\.-]+\.[\w]+/', $_POST["email"])
+				&& isset($_POST["type"])
+			) {
 				$registerStatus;
 				switch ($_POST["type"]) {
 					case "admin":
@@ -40,7 +52,7 @@ if (isset($_POST["target"])) {
 				}
 			} else {
 				http_response_code(400);
-				echo (json_encode(["ok" => false, "msg" => "bad request: nick, password or email not specified"]));
+				echo (json_encode(["ok" => false, "msg" => "bad request"]));
 			}
 			break;
 		case "login":
