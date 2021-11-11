@@ -34,16 +34,39 @@ function tryRequestCar($carID, $userID, $borrowTime)
 function tryGetCars()
 {
 	global $conn;
-	$query = $conn->query("select cars.ID, curr_booked.userID as booked, pending_requests.userID as requested,
-	 cars.img_url as url
-	 from cars left join curr_booked on curr_booked.carID = cars.ID
-	 left join pending_requests on pending_requests.carID = cars.ID;");
+	$query = $conn->query("SELECT cars.ID,
+	curr_booked.userID AS booked,
+	pending_requests.userID AS requested,
+	cars.img_url AS url,
+	car_makes.name AS make,
+	cars.model AS model,
+	colors.name AS color,
+	body_types.name AS body,
+	cars.power AS power,
+	drive_types.name AS drive
+	FROM cars LEFT JOIN curr_booked ON curr_booked.carID = cars.ID
+	LEFT JOIN pending_requests ON pending_requests.carID = cars.ID
+	INNER JOIN car_makes ON cars.makeID = car_makes.ID
+	INNER JOIN colors ON cars.color_id = colors.ID
+	INNER JOIN body_types ON cars.body_id = body_types.ID
+	INNER JOIN drive_types ON cars.drive_id = drive_types.ID;");
 	if ($query) {
 		$cars = [];
 		$data = $query->fetch_all();
 		foreach ($data as $row) {
 			if (!isset($cars[$row[0]]))
-				$cars[$row[0]] = ["booked" => false, "requestCount" => 0, "url" => $row[3]];
+				$cars[$row[0]] = [
+					"id" => $row[0],
+					"booked" => false,
+					"requestCount" => 0,
+					"url" => $row[3],
+					"make" => $row[4],
+					"model" => $row[5],
+					"color" => $row[6],
+					"body" => $row[7],
+					"power" => $row[8],
+					"drive" => $row[9]
+				];
 			if ($row[1] != NULL)
 				$cars[$row[0]]["booked"] = true;
 			if ($row[2] != NULL)
@@ -51,7 +74,7 @@ function tryGetCars()
 		}
 		$parsed = [];
 		foreach (array_keys($cars) as $key) {
-			$parsed[] = ["id" => $key, "booked" => $cars[$key]["booked"], "requestCount" => $cars[$key]["requestCount"], "url" => $cars[$key]["url"]];
+			$parsed[] = $cars[$key];
 		}
 		return new ReturnState("ok", $parsed);
 	} else {

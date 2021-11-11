@@ -68,7 +68,15 @@
 				bind:clientHeight={maxScrollTarget}
 			>
 				{#each data as item}
-					<Card url={item.url} />
+					<Card
+						url={item.url}
+						make={item.make}
+						model={item.model}
+						color={item.color}
+						body={item.body}
+						drive={item.drive}
+						power={item.power}
+					/>
 				{/each}
 			</div>
 		{:catch err}
