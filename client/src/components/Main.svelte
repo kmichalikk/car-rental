@@ -1,19 +1,57 @@
 <script>
+	import { filters } from "../stores";
+
 	import Card from "./Card.svelte";
+	import Filter from "./Filter.svelte";
 	import Loading from "./Loading.svelte";
-	// obsługa listy samochodów
-	let fetchCarsProm = new Promise((resolve, reject) => {
-		let fd = new FormData();
-		fd.append("target", "getcars");
-		fetch("http://localhost:8080/carRental/server/server.php", {
-			method: "post",
-			body: fd,
+	// pobranie listy samochodów
+	let serverResponded = false;
+	let success = true;
+	let errorMessage = "";
+	let allCars = [];
+	let fd = new FormData();
+	fd.append("target", "getcars");
+	fetch("http://localhost:8080/carRental/server/server.php", {
+		method: "post",
+		body: fd,
+	})
+		.then((res) => res.json())
+		.then((data) => {
+			serverResponded = true;
+			success = true;
+			allCars = data.data;
 		})
-			.then((res) => res.json())
-			.then((data) => {
-				resolve(data.data);
-			})
-			.catch((err) => reject(err));
+		.catch((err) => {
+			serverResponded = true;
+			success = false;
+			errorMessage = err;
+		});
+
+	$: filterCarsProm = new Promise((resolve) => {
+		if ($filters.numFilters > 0) {
+			let filtered = allCars;
+			// jakie marki chcemy?
+			let acceptedMakes = $filters.makes.filter((val) => val.selected == true);
+			// jeśli jest chociaż jeden filtr marki wybrany, filtrujemy
+			// w inny wypadku bierzemy wszystkie
+			if (acceptedMakes.length > 0)
+				filtered = filtered.filter((car) => acceptedMakes.findIndex((val) => val.name == car.make) != -1);
+			// dalej analogicznie
+			let acceptedColors = $filters.colors.filter((val) => val.selected == true);
+			if (acceptedColors.length > 0)
+				filtered = filtered.filter((car) => acceptedColors.findIndex((val) => val.name == car.color) != -1);
+			//
+			let acceptedBodyTypes = $filters.bodies.filter((val) => val.selected == true);
+			if (acceptedBodyTypes.length > 0)
+				filtered = filtered.filter((car) => acceptedBodyTypes.findIndex((val) => val.name == car.body) != -1);
+			//
+			let acceptedDrives = $filters.drives.filter((val) => val.selected == true);
+			if (acceptedDrives.length > 0)
+				filtered = filtered.filter((car) => acceptedDrives.findIndex((val) => val.name == car.drive) != -1);
+			resolve(filtered);
+		} else {
+			resolve(allCars);
+		}
 	});
 
 	// płynne scrollowanie - ręcznie, bo nie mamy paska scrollowania
@@ -57,37 +95,46 @@
 		on:touchstart|preventDefault={touchStartHandler}
 		on:touchmove|preventDefault={touchMoveHandler}
 	>
-		{#await fetchCarsProm}
+		{#if !serverResponded}
 			<div class="h-2/3 flex items-center justify-center">
 				<Loading />
 			</div>
-		{:then data}
-			<div
-				class="xl:grid-xl lg:grid-large md:grid-md grid-xs sm:grid-sm"
-				style="transform: translate(0, {currScroll}px"
-				bind:clientHeight={maxScrollTarget}
-			>
-				{#each data as item}
-					<Card
-						url={item.url}
-						make={item.make}
-						model={item.model}
-						color={item.color}
-						body={item.body}
-						drive={item.drive}
-						power={item.power}
-					/>
-				{/each}
-			</div>
-		{:catch err}
+		{:else if success}
+			{#await filterCarsProm}
+				<div class="h-2/3 flex items-center justify-center">
+					<Loading />
+				</div>
+			{:then data}
+				<div
+					class="xl:grid-xl lg:grid-large md:grid-md grid-xs sm:grid-sm"
+					style="transform: translate(0, {currScroll}px"
+					bind:clientHeight={maxScrollTarget}
+				>
+					{#each data as item}
+						<Card
+							url={item.url}
+							make={item.make}
+							model={item.model}
+							color={item.color}
+							body={item.body}
+							drive={item.drive}
+							power={item.power}
+							wantedBy={item.requestCount}
+							booked={item.booked}
+						/>
+					{/each}
+				</div>
+			{/await}
+		{:else}
 			<div class="h-2/3 flex items-center justify-center flex-col">
 				<Loading />
 				<span class="text-white">Wystąpił błąd podczas pobierania danych:<br /></span>
-				<span class="text-white">{err}</span>
+				<span class="text-white">{errorMessage}</span>
 			</div>
-		{/await}
+		{/if}
 	</div>
 </main>
+<Filter />
 
 <style lang="postcss">
 	@layer utilities {

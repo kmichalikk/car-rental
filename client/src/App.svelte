@@ -1,5 +1,5 @@
 <script>
-	import { user } from "./stores";
+	import { filters, user } from "./stores";
 	import Router from "svelte-spa-router";
 	import Header from "./components/Header.svelte";
 	import Main from "./components/Main.svelte";
@@ -15,12 +15,37 @@
 		"/dashboard": Dashboard,
 		"*": NotFound,
 	};
+	// próba logowania
 	let fd = new FormData();
 	fd.append("target", "hello");
 	fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
 		.then((res) => res.json())
 		.then((data) => {
 			if (data.ok) user.set({ loggedIn: true, nick: data.nick });
+		})
+		.catch((err) => console.log(err));
+	// próba pobrania filtrów
+	let fd2 = new FormData();
+	fd.append("target", "getfilters");
+	fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+		.then((res) => res.json())
+		.then((json) => {
+			if (json.ok)
+				filters.set({
+					numFilters: 0,
+					colors: json.data.colors.map((val) => {
+						return { ...val, selected: false };
+					}),
+					makes: json.data.makes.map((val) => {
+						return { ...val, selected: false };
+					}),
+					drives: json.data.drives.map((val) => {
+						return { ...val, selected: false };
+					}),
+					bodies: json.data.bodies.map((val) => {
+						return { ...val, selected: false };
+					}),
+				});
 		})
 		.catch((err) => console.log(err));
 </script>

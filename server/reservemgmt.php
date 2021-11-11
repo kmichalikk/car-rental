@@ -82,6 +82,32 @@ function tryGetCars()
 	}
 }
 
+function tryGetFilters()
+{
+	global $conn;
+	$queryMakes = $conn->query("SELECT ID, name FROM car_makes");
+	$queryColors = $conn->query("SELECT ID, name, hex FROM colors");
+	$queryDrives = $conn->query("SELECT ID, name FROM drive_types");
+	$queryCarBodies = $conn->query("SELECT ID, name FROM body_types");
+	if ($queryMakes && $queryColors && $queryDrives && $queryCarBodies) {
+		$makes = array_map(function ($val) {
+			return ["id" => $val[0], "name" => $val[1]];
+		}, $queryMakes->fetch_all());
+		$colors = array_map(function ($val) {
+			return ["id" => $val[0], "name" => $val[1], "hex" => $val[2]];
+		}, $queryColors->fetch_all());
+		$drives = array_map(function ($val) {
+			return ["id" => $val[0], "name" => $val[1]];
+		}, $queryDrives->fetch_all());
+		$bodies = array_map(function ($val) {
+			return ["id" => $val[0], "name" => $val[1]];
+		}, $queryCarBodies->fetch_all());
+		return new ReturnState("ok", ["makes" => $makes, "colors" => $colors, "drives" => $drives, "bodies" => $bodies]);
+	} else {
+		return new ReturnState("dbfail", $conn->error);
+	}
+}
+
 function tryGetUserCars($userID)
 {
 	global $conn;

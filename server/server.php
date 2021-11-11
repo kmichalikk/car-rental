@@ -124,6 +124,15 @@ if (isset($_POST["target"])) {
 				echo (json_encode(["ok" => false, "msg" => "unknown error"]));
 			}
 			break;
+		case "getfilters":
+			$filters = tryGetFilters();
+			if ($filters->status == "dbfail") {
+				http_response_code(500);
+				echo (json_encode(["ok" => false, "msg" => $filters->additionalInfo]));
+			} else {
+				echo (json_encode(["ok" => true, "data" => $filters->additionalInfo]));
+			}
+			break;
 		case "mycars":
 			if (isset($_SESSION["loggedInUser"])) {
 				$getResult = tryGetUserCars($_SESSION["loggedInUser"]["id"]);
