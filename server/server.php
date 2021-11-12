@@ -85,8 +85,11 @@ if (isset($_POST["target"])) {
 			break;
 		case "requestcar":
 			if (isset($_SESSION["loggedInUser"])) {
-				if (isset($_POST["carid"]) && intval($_POST["carid"]) > 0 && isset($_POST["borrowtime"]) && intval($_POST["borrowtime"]) > 0) {
-					$requestStatus = tryRequestCar(intval($_POST["carid"]), $_SESSION["loggedInUser"]["id"], intval($_POST["borrowtime"]));
+				$hasAllParams = isset($_POST["carid"]) && intval($_POST["carid"]) > 0 && isset($_POST["startdatetime"]) && isset($_POST["enddatetime"]);
+				$startdt = $hasAllParams ? date_create_from_format("Y-m-d H:i:s", $_POST["startdatetime"]) : false;
+				$enddt = $hasAllParams ? date_create_from_format("Y-m-d H:i:s", $_POST["enddatetime"]) : false;
+				if ($hasAllParams && $startdt && $enddt && $startdt > new DateTime() && $enddt > $startdt) {
+					$requestStatus = tryRequestCar(intval($_POST["carid"]), $_SESSION["loggedInUser"]["id"], $_POST["startdatetime"], $_POST["enddatetime"]);
 					if ($requestStatus->status == "ok") {
 						echo (json_encode(["ok" => true]));
 					} else if ($requestStatus->status == "nonexistent") {
@@ -104,7 +107,7 @@ if (isset($_POST["target"])) {
 					}
 				} else {
 					http_response_code(400);
-					echo (json_encode(["ok" => false, "msg" => "bad request: carid > 0 or borrowtime > 0 not specified"]));
+					echo (json_encode(["ok" => false, "msg" => "bad request"]));
 				}
 			} else {
 				http_response_code(401);
@@ -122,6 +125,26 @@ if (isset($_POST["target"])) {
 			} else {
 				http_response_code(500);
 				echo (json_encode(["ok" => false, "msg" => "unknown error"]));
+			}
+			break;
+		case "cardetails":
+			if (isset($_POST["carid"]) && intval($_POST["carid"]) >= 0) {
+				$getResult = tryGetDetails(intval($_POST["carid"]));
+				if ($getResult->status == "ok") {
+					echo (json_encode(["ok" => true, "data" => $getResult->additionalInfo]));
+				} else if ($getResult->status == "nonexistent") {
+					http_response_code(404);
+					echo (json_encode(["ok" => false, "msg" => "no such car"]));
+				} else if ($getResult->status == "dbfail") {
+					http_response_code(500);
+					echo (json_encode(["ok" => false, "msg" => $getResult->additionalInfo]));
+				} else {
+					http_response_code(500);
+					echo (json_encode(["ok" => false, "msg" => "unknown error"]));
+				}
+			} else {
+				http_response_code(400);
+				echo (json_encode(["ok" => false, "msg" => "bad request"]));
 			}
 			break;
 		case "getfilters":
@@ -169,8 +192,12 @@ if (isset($_POST["target"])) {
 			break;
 		case "acceptrequest":
 			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
-				if (isset($_POST["reqid"]) && intval($_POST["reqid"]) > 0 && isset($_POST["borrowtime"]) && intval($_POST["borrowtime"]) > 0) {
-					$acceptResult = tryAcceptRequest($_POST["reqid"], $_POST["borrowtime"]);
+				$hasAllParams = isset($_POST["reqid"]) && intval($_POST["reqid"]) > 0
+					&& isset($_POST["startdatetime"]) && isset($_POST["enddatetime"]);
+				$startdt = $hasAllParams ? date_create_from_format("Y-m-d H:i:s", $_POST["startdatetime"]) : false;
+				$enddt = $hasAllParams ? date_create_from_format("Y-m-d H:i:s", $_POST["enddatetime"]) : false;
+				if ($hasAllParams && $startdt && $enddt && $startdt > new DateTime() && $enddt > $startdt) {
+					$acceptResult = tryAcceptRequest($_POST["reqid"], $_POST["startdatetime"], $_POST["enddatetime"]);
 					if ($acceptResult->status == "ok") {
 						echo (json_encode(["ok" => true]));
 					} else if ($acceptResult->status == "nonexistent") {
@@ -185,7 +212,7 @@ if (isset($_POST["target"])) {
 					}
 				} else {
 					http_response_code(400);
-					echo (json_encode(["ok" => false, "msg" => "bad request: missing reqid > 0 and/or borrowtime > 0"]));
+					echo (json_encode(["ok" => false, "msg" => "bad request"]));
 				}
 			} else {
 				http_response_code(401);

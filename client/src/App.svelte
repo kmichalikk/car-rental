@@ -7,12 +7,14 @@
 	import Login from "./components/Login.svelte";
 	import Register from "./components/Register.svelte";
 	import Dashboard from "./components/Dashboard.svelte";
+	import CarDetails from "./components/CarDetails.svelte";
 
 	const routes = {
 		"/": Main,
 		"/login": Login,
 		"/register": Register,
 		"/dashboard": Dashboard,
+		"/details/:carid": CarDetails,
 		"*": NotFound,
 	};
 	// próba logowania

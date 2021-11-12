@@ -1,4 +1,7 @@
 <script>
+	import { push } from "svelte-spa-router";
+
+	export let id;
 	export let url = "";
 	export let make = "";
 	export let model = "";
@@ -6,6 +9,7 @@
 	export let body = "";
 	export let drive = "";
 	export let power = "";
+	export let price = 0;
 	export let wantedBy = 0;
 	export let booked = false;
 </script>
@@ -13,13 +17,13 @@
 <div
 	class="w-full h-full rounded-lg shadow-md flex justify-start flex-col bg-white overflow-hidden cursor-pointer relative"
 	on:click={() => {
-		alert("kliknięto " + make + " " + model);
+		push("/details/" + id);
 	}}
 >
 	<div class="w-full h-2/5 bg-cover bg-no-repeat" style="background-image: url({url})" />
 	{#if wantedBy > 0}
 		<div class=" absolute right-2 top-2 h-8 px-2 bg-purple-700 text-white rounded-lg shadow-lg flex items-center">
-			{wantedBy} <i class="fas fa-user pl-2" />
+			{wantedBy} <i class="far fa-eye pl-2" />
 		</div>
 	{/if}
 	<div class="p-4">
@@ -32,6 +36,8 @@
 		<span class=" text-2xl md:text-base">{drive}</span><br />
 		<span class="font-bold text-2xl md:text-base text-purple-700">moc: </span>
 		<span class=" text-2xl md:text-base">{power} KM</span><br />
+		<span class="font-bold text-2xl md:text-base text-purple-700">cena: </span>
+		<span class=" text-2xl md:text-base">{price} zł/h</span><br />
 	</div>
 	{#if booked}
 		<div

@@ -112,6 +112,7 @@
 				>
 					{#each data as item}
 						<Card
+							id={item.id}
 							url={item.url}
 							make={item.make}
 							model={item.model}
@@ -119,6 +120,7 @@
 							body={item.body}
 							drive={item.drive}
 							power={item.power}
+							price={item.price}
 							wantedBy={item.requestCount}
 							booked={item.booked}
 						/>
