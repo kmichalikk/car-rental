@@ -16,7 +16,7 @@
 				.then((res) => res.json())
 				.then((data) => {
 					if (data.ok) {
-						user.set({ loggedIn: true, nick: nick });
+						user.set({ loggedIn: true, nick: nick, type: data.type });
 						push("/");
 					}
 				});

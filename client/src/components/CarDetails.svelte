@@ -1,7 +1,9 @@
 <script>
 	import { user } from "../stores";
+	import { push } from "svelte-spa-router";
 	import Card from "./Card.svelte";
 	import Loading from "./Loading.svelte";
+	import Button from "./Button.svelte";
 
 	export let params = {};
 	let costPerHour = 0;
@@ -40,16 +42,21 @@
 	let fixInputs = () => {
 		// wyrównanie inputów do następnej pełnej godziny
 		if (startTs) {
-			let date = new Date(startTs + 3600000);
-			startdtText = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}T${("0" + date.getHours()).slice(
+			if (startTs < Date.now()) startTs = Date.now();
+			let date = new Date(startTs + 3599000);
+			startdtText = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + date.getDate()).slice(
 				-2
-			)}:00`;
+			)}T${("0" + date.getHours()).slice(-2)}:00:00`;
 		}
 		if (endTs) {
-			let date = new Date(endTs + 3600000);
-			enddtText = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}T${("0" + date.getHours()).slice(
-				-2
-			)}:00`;
+			if (endTs > startTs) {
+				let date = new Date(endTs + 3599000);
+				enddtText = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + date.getDate()).slice(
+					-2
+				)}T${("0" + date.getHours()).slice(-2)}:00:00`;
+			} else {
+				enddtText = "";
+			}
 		}
 
 		// obliczenie totalCost - jeśli to możliwe
@@ -71,8 +78,8 @@
 		let fd = new FormData();
 		fd.append("target", "requestcar");
 		fd.append("carid", carID);
-		fd.append("startdatetime", startdtText.replace("T", " ") + ":00");
-		fd.append("enddatetime", enddtText.replace("T", " ") + ":00");
+		fd.append("startdatetime", startdtText.replace("T", " "));
+		fd.append("enddatetime", enddtText.replace("T", " "));
 		fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
 			.then((res) => res.json())
 			.then((data) => {
@@ -99,7 +106,7 @@
 						<div class="flex flex-col">
 							<span class="text-3xl text-center md:text-left">Rezerwacja samochodu</span>
 							<br />
-							{#if $user.loggedIn}
+							{#if $user.loggedIn && $user.type == "user"}
 								{#if !data.booked}
 									<form on:submit|preventDefault={handleSubmit} class="px-4 flex flex-col">
 										<label for class="text-lg">Określ, kiedy chciałbyś wypożyczyć ten samochód <sup>*</sup>:</label>
@@ -147,6 +154,8 @@
 								{:else}
 									<div class="w-2/3 text-lg">Ten samochód jest zajęty.</div>
 								{/if}
+							{:else if $user.loggedIn && $user.type == "admin"}
+								<div class="w-2/3 text-lg">Jako administrator nie możesz rezerwować samochodów.</div>
 							{:else}
 								<div class="w-2/3 text-lg">Rezerwacja samochodu jest możliwa jedynie po zalogowaniu.</div>
 							{/if}
@@ -168,7 +177,7 @@
 						</div>
 						<span class="text-3xl md:hidden pb-8 ">{data.make} {data.model}</span>
 					</div>
-					{#if $user.loggedIn && !data.booked}
+					{#if $user.loggedIn && $user.type == "user" && !data.booked}
 						<div class="w-full text-gray-400 p-4">
 							<sup>*</sup> Faktyczny przedział czasowy, na który zostanie wypożyczony samochód może ulec zmianie. Twoje zgłoszenie
 							może zostać anulowane, jeśli więcej klientów będzie ubiegać się o ten samochód w tym samym czasie
@@ -176,9 +185,23 @@
 					{/if}
 				</div>
 			{:else if submitSuccessful}
-				sukces
+				<i class="text-purple-700 fa-10x far fa-smile" />
+				<span class="text-3xl my-8">Zgłoszenie przyjęte</span>
+				<Button
+					text="Wróć do strony głównej"
+					clickFn={() => {
+						push("/");
+					}}
+				/>
 			{:else}
-				nie sukces
+				<i class="text-purple-700 fa-10x far fa-frown" />
+				<span class="text-3xl my-8">Nie udało się przesłać zgłoszenia</span>
+				<Button
+					text="Wróć do strony głównej"
+					clickFn={() => {
+						push("/");
+					}}
+				/>
 			{/if}
 		{/await}
 	</div>

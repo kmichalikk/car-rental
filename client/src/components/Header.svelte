@@ -13,7 +13,8 @@
 		{#if $user.loggedIn}
 			<Button
 				clickFn={() => {
-					push("/dashboard");
+					if ($user.type == "user") push("/userdashboard");
+					else if ($user.type == "admin") push("/admindashboard");
 				}}
 				text={$user.nick}
 			/>

@@ -6,14 +6,16 @@
 	import NotFound from "./components/NotFound.svelte";
 	import Login from "./components/Login.svelte";
 	import Register from "./components/Register.svelte";
-	import Dashboard from "./components/Dashboard.svelte";
+	import UserDashboard from "./components/UserDashboard.svelte";
+	import AdminDashboard from "./components/AdminDashboard.svelte";
 	import CarDetails from "./components/CarDetails.svelte";
 
 	const routes = {
 		"/": Main,
 		"/login": Login,
 		"/register": Register,
-		"/dashboard": Dashboard,
+		"/userdashboard": UserDashboard,
+		"/admindashboard": AdminDashboard,
 		"/details/:carid": CarDetails,
 		"*": NotFound,
 	};
@@ -23,7 +25,7 @@
 	fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
 		.then((res) => res.json())
 		.then((data) => {
-			if (data.ok) user.set({ loggedIn: true, nick: data.nick });
+			if (data.ok) user.set({ loggedIn: true, nick: data.nick, type: data.type });
 		})
 		.catch((err) => console.log(err));
 	// próba pobrania filtrów

@@ -66,7 +66,7 @@ if (isset($_POST["target"])) {
 				$loginStatus = tryLogin($_POST["nick"], $_POST["password"]);
 				if ($loginStatus->status == "ok") {
 					$_SESSION["loggedInUser"] = $loginStatus->additionalInfo;
-					echo (json_encode(["ok" => true]));
+					echo (json_encode(["ok" => true, "type" => $loginStatus->additionalInfo["type"] == ACCOUNT_ADMIN ? "admin" : "user"]));
 				} else if ($loginStatus->status == "loginfail") {
 					http_response_code(401);
 					echo (json_encode(["ok" => false, "msg" => "unauthorized: wrong password"]));
@@ -177,7 +177,7 @@ if (isset($_POST["target"])) {
 			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
 				$getRequests = tryGetRequests();
 				if ($getRequests->status == "ok") {
-					echo (json_encode($getRequests->additionalInfo));
+					echo (json_encode(["ok" => true, "data" => $getRequests->additionalInfo]));
 				} else if ($getRequests->status == "dbfail") {
 					http_response_code(500);
 					echo (json_encode(["ok" => false, "msg" => $getRequests->additionalInfo]));
@@ -192,7 +192,7 @@ if (isset($_POST["target"])) {
 			break;
 		case "acceptrequest":
 			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
-				$hasAllParams = isset($_POST["reqid"]) && intval($_POST["reqid"]) > 0
+				$hasAllParams = isset($_POST["reqid"]) && intval($_POST["reqid"]) >= 0
 					&& isset($_POST["startdatetime"]) && isset($_POST["enddatetime"]);
 				$startdt = $hasAllParams ? date_create_from_format("Y-m-d H:i:s", $_POST["startdatetime"]) : false;
 				$enddt = $hasAllParams ? date_create_from_format("Y-m-d H:i:s", $_POST["enddatetime"]) : false;
