@@ -23,7 +23,7 @@
 	style="width: {width}px; height: {height}px;"
 >
 	<div
-		class="absolute top-2 left-2 w-12 h-12 flex items-center justify-center shadow-lg rounded-lg {collapsed
+		class="absolute top-2 left-2 w-12 h-12 flex items-center justify-center shadow-lg rounded-lg cursor-pointer {collapsed
 			? 'bg-white'
 			: 'bg-purple-700'}"
 		on:click={showOpts}
