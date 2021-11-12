@@ -59,10 +59,14 @@
 	let scrollTarget = 0;
 	let minScrollTarget = 0;
 	let maxScrollTarget = 0;
+	let contentHeight = 0;
+	$: console.log(contentHeight);
 	let mouseScrollHandler = (e) => {
 		let newTarget = scrollTarget - e.deltaY;
-		if (newTarget > -maxScrollTarget && newTarget < minScrollTarget) {
+		if (newTarget > -maxScrollTarget + contentHeight - 200 && newTarget < minScrollTarget) {
 			scrollTarget = newTarget;
+		} else if (newTarget >= minScrollTarget) {
+			scrollTarget = 0;
 		}
 	};
 	let prevTouchRegisterY = 0;
@@ -71,7 +75,7 @@
 	};
 	let touchMoveHandler = (e) => {
 		let newTarget = scrollTarget + (e.targetTouches[0].clientY - prevTouchRegisterY);
-		if (newTarget > -maxScrollTarget && newTarget < minScrollTarget) {
+		if (newTarget > -maxScrollTarget + contentHeight - 150 && newTarget < minScrollTarget) {
 			scrollTarget = newTarget;
 		}
 		prevTouchRegisterY = e.targetTouches[0].clientY;
@@ -91,6 +95,7 @@
 <main class="w-screen h-screen py-28 flex flex-column flex-wrap justify-center overflow-visible">
 	<div
 		class="fixed h-full"
+		bind:clientHeight={contentHeight}
 		on:wheel={mouseScrollHandler}
 		on:touchstart|preventDefault={touchStartHandler}
 		on:touchmove|preventDefault={touchMoveHandler}
