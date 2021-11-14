@@ -5,6 +5,7 @@
 	import ListItem from "./ListItem.svelte";
 	import QrCode from "svelte-qrcode";
 	import Loading from "./Loading.svelte";
+	import { SERVER_URL } from "../config";
 
 	let loggingOut = false;
 	let userRequested = [];
@@ -12,7 +13,7 @@
 	let fd = new FormData();
 	let fetching = true;
 	fd.append("target", "mycars");
-	fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+	fetch(SERVER_URL, { method: "post", body: fd })
 		.then((res) => res.json())
 		.then((data) => {
 			fetching = false;
@@ -35,7 +36,7 @@
 						loggingOut = true;
 						let fd = new FormData();
 						fd.append("target", "logout");
-						fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+						fetch(SERVER_URL, { method: "post", body: fd })
 							.then((res) => res.json())
 							.then((data) => {
 								loggingOut = false;

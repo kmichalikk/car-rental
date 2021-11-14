@@ -1,4 +1,6 @@
 <script>
+	import { SERVER_URL } from "../config";
+	import { link } from "svelte-spa-router";
 	import Loading from "./Loading.svelte";
 	let nick = "";
 	$: nickValid = nick;
@@ -26,7 +28,7 @@
 			fd.append("password", pass);
 			fd.append("type", "user");
 			fd.append("target", "register");
-			fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+			fetch(SERVER_URL, { method: "post", body: fd })
 				.then((res) => res.json())
 				.then((data) => {
 					gotResponse = true;
@@ -86,12 +88,12 @@
 					class="bg-purple-700 text-white py-2 px-4 rounded-lg shadow-sm cursor-pointer"
 				/>
 			</form>
-			<span>Masz już konto? <a href="/#/login" class="text-purple-700 font-semibold">Zaloguj się</a></span>
+			<span>Masz już konto? <a href="/login" use:link class="text-purple-700 font-semibold">Zaloguj się</a></span>
 		{:else if !gotResponse}
 			<Loading />
 		{:else if success}
 			<div class="text-purple-700 text-4xl">Sukces</div>
-			<div>teraz możesz się zalogować klikając <a href="/#/login" class="text-purple-700 font-semibold">tutaj</a></div>
+			<div>teraz możesz się zalogować klikając <a href="#/login" class="text-purple-700 font-semibold">tutaj</a></div>
 		{:else}
 			<div class="text-purple-700 text-4xl">Ups</div>
 			<div class="text-center mt-4">
@@ -108,7 +110,7 @@
 						success = false;
 					}}>tutaj</span
 				><br />
-				Lub zalogować się klikając <a href="/#/login" class="text-purple-700 font-semibold">tutaj</a>
+				Lub zalogować się klikając <a href="/login" use:link class="text-purple-700 font-semibold">tutaj</a>
 			</div>
 		{/if}
 	</div>

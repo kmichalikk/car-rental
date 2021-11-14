@@ -4,6 +4,7 @@
 	import Card from "./Card.svelte";
 	import Loading from "./Loading.svelte";
 	import Button from "./Button.svelte";
+	import { SERVER_URL } from "../config";
 
 	export let params = {};
 	let costPerHour = 0;
@@ -13,7 +14,7 @@
 		let fd = new FormData();
 		fd.append("target", "cardetails");
 		fd.append("carid", params.carid);
-		fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+		fetch(SERVER_URL, { method: "post", body: fd })
 			.then((res) => res.json())
 			.then((data) => {
 				if (data.ok) {
@@ -80,7 +81,7 @@
 		fd.append("carid", carID);
 		fd.append("startdatetime", startdtText.replace("T", " "));
 		fd.append("enddatetime", enddtText.replace("T", " "));
-		fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+		fetch(SERVER_URL, { method: "post", body: fd })
 			.then((res) => res.json())
 			.then((data) => {
 				submitFinished = true;

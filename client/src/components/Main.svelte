@@ -4,6 +4,8 @@
 	import Card from "./Card.svelte";
 	import Filter from "./Filter.svelte";
 	import Loading from "./Loading.svelte";
+
+	import { SERVER_URL } from "../config";
 	// pobranie listy samochodów
 	let serverResponded = false;
 	let success = true;
@@ -11,7 +13,7 @@
 	let allCars = [];
 	let fd = new FormData();
 	fd.append("target", "getcars");
-	fetch("http://localhost:8080/carRental/server/server.php", {
+	fetch(SERVER_URL, {
 		method: "post",
 		body: fd,
 	})

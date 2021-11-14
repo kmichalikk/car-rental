@@ -1,7 +1,8 @@
 <script>
-	import { push } from "svelte-spa-router";
-
+	import { push, link } from "svelte-spa-router";
 	import { user } from "../stores";
+	import { SERVER_URL } from "../config";
+
 	let nick = "";
 	$: nickValid = nick.length > 0;
 	let pass = "";
@@ -12,7 +13,7 @@
 			fd.append("target", "login");
 			fd.append("nick", nick);
 			fd.append("password", pass);
-			fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+			fetch(SERVER_URL, { method: "post", body: fd })
 				.then((res) => res.json())
 				.then((data) => {
 					if (data.ok) {
@@ -47,7 +48,9 @@
 					class="bg-purple-700 text-white py-2 px-4 rounded-lg shadow-sm cursor-pointer"
 				/>
 			</form>
-			<span>Nie masz jeszcze konta? <a href="/#/register" class="text-purple-700 font-semibold">Załóż je</a></span>
+			<span
+				>Nie masz jeszcze konta? <a href="/register" use:link class="text-purple-700 font-semibold">Załóż je</a></span
+			>
 		{:else}
 			<h1 class="text-purple-700 text-2xl">{$user.nick}</h1>
 			jesteś już zalogowany

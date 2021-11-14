@@ -1,5 +1,4 @@
 <script>
-	import { update_await_block_branch } from "svelte/internal";
 	import { filters } from "../stores";
 
 	let width = 0;

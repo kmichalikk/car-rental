@@ -4,6 +4,7 @@
 	import Button from "./Button.svelte";
 	import Loading from "./Loading.svelte";
 	import UserRequestListItem from "./UserRequestListItem.svelte";
+	import { SERVER_URL } from "../config";
 	let tabs = ["requests", "users", "deadlines", "simtime"];
 	let currTab = "requests";
 
@@ -18,7 +19,7 @@
 		updating = true;
 		let fd = new FormData();
 		fd.append("target", "getrequests");
-		fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+		fetch(SERVER_URL, { method: "post", body: fd })
 			.then((res) => res.json())
 			.then((data) => {
 				updating = false;
@@ -41,7 +42,7 @@
 		fd.append("reqid", reqid);
 		fd.append("startdatetime", start.replace("T", " "));
 		fd.append("enddatetime", end.replace("T", " "));
-		fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+		fetch(SERVER_URL, { method: "post", body: fd })
 			.then((res) => res.json())
 			.then((data) => {
 				if (data.ok) {
@@ -59,7 +60,7 @@
 				clickFn={() => {
 					let fd = new FormData();
 					fd.append("target", "logout");
-					fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+					fetch(SERVER_URL, { method: "post", body: fd })
 						.then((res) => res.json())
 						.then((data) => {
 							if (data.ok) {
