@@ -219,6 +219,57 @@ if (isset($_POST["target"])) {
 				echo (json_encode(["ok" => false, "msg" => "you must be logged as admin to accept requests"]));
 			}
 			break;
+		case "getusers":
+			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
+				$users = tryGetUsers();
+				if ($users->status == "ok") {
+					echo json_encode(["ok" => true, "data" => $users->additionalInfo]);
+				} else if ($users->status == "dbfail") {
+					http_response_code(500);
+					echo json_encode(["ok" => false, "msg" => $users->additionalInfo]);
+				} else {
+					http_response_code(500);
+					echo json_encode(["ok" => false, "msg" => "unknown error"]);
+				}
+			} else {
+				http_response_code(401);
+				echo (json_encode(["ok" => false, "msg" => "you must be admin to list users"]));
+			}
+			break;
+		case "grantadmin":
+			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
+				if (isset($_POST["userid"]) && ctype_digit($_POST["userid"]) == true) {
+					$grantResult = tryGrantAdmin($_POST["userid"]);
+					switch ($grantResult->status) {
+						case "ok":
+							echo (json_encode(["ok" => true]));
+							break;
+						case "alreadyadmin":
+							http_response_code(400);
+							echo (json_encode(["ok" => false, "msg" => "user already is admin"]));
+							break;
+						case "nonexistent":
+							http_response_code(404);
+							echo (json_encode(["ok" => false, "msg" => "user doesn't exist"]));
+							break;
+						case "dbfail":
+							http_response_code(500);
+							echo (json_encode(["ok" => false, "msg" => $grantResult->additionalInfo]));
+							break;
+						default:
+							http_response_code(500);
+							echo (json_encode(["ok" => false, "msg" => "unknown error"]));
+							break;
+					}
+				} else {
+					http_response_code(400);
+					echo (json_encode(["ok" => false, "msg" => "bad request"]));
+				}
+			} else {
+				http_response_code(401);
+				echo (json_encode(["ok" => false, "msg" => "you must be admin to grant admin access to users"]));
+			}
+			break;
 		default:
 			http_response_code(400);
 			echo (json_encode(["ok" => false, "msg" => "missing or wrong target"]));

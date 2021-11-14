@@ -1,4 +1,7 @@
 <?php
+
+use JetBrains\PhpStorm\Internal\ReturnTypeContract;
+
 require_once "connect.php";
 require_once "utils.php";
 
@@ -58,4 +61,53 @@ function tryLogin($username, $pass)
 function logout()
 {
 	unset($_SESSION["loggedInUser"]);
+}
+
+function tryGetUsers()
+{
+	global $conn;
+	$query = $conn->query("SELECT ID, nick, email FROM users WHERE type = 1");
+	if ($query) {
+		$data = $query->fetch_all();
+		if ($data) {
+			$parsed = [];
+			foreach ($data as $row) {
+				$parsed[] = [
+					"id" => $row[0],
+					"nick" => $row[1],
+					"email" => $row[2]
+				];
+			}
+			return new ReturnState("ok", $parsed);
+		} else {
+			return new ReturnState("dbfail", $conn->error);
+		}
+	} else {
+		return new ReturnState("dbfail", $conn->error);
+	}
+}
+
+function tryGrantAdmin($userid)
+{
+	global $conn;
+	$query = $conn->query("SELECT type FROM users WHERE ID = $userid");
+	if ($query) {
+		$type = $query->fetch_row();
+		if ($type !== null) {
+			if ($type[0] == 1) {
+				$grantQuery = $conn->query("UPDATE users SET type = 0 WHERE ID = $userid");
+				if ($grantQuery) {
+					return new ReturnState("ok", null);
+				} else {
+					return new ReturnState("dbfail", $conn->error);
+				}
+			} else {
+				return new ReturnState("alreadyadmin", null);
+			}
+		} else {
+			return new ReturnState("nonexistent", null);
+		}
+	} else {
+		return new ReturnState("dbfail", $conn->error);
+	}
 }

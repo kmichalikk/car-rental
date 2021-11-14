@@ -4,7 +4,9 @@
 	import Button from "./Button.svelte";
 	import Loading from "./Loading.svelte";
 	import UserRequestListItem from "./UserRequestListItem.svelte";
+	import ListItem from "./ListItem.svelte";
 	import { SERVER_URL } from "../config";
+	import { dataset_dev } from "svelte/internal";
 	let tabs = ["requests", "users", "deadlines", "simtime"];
 	let currTab = "requests";
 
@@ -47,6 +49,31 @@
 			.then((data) => {
 				if (data.ok) {
 					updateRequests();
+				}
+			});
+	};
+
+	let users = [];
+	let updateUsers = () => {
+		let fd = new FormData();
+		fd.append("target", "getusers");
+		fetch(SERVER_URL, { method: "post", body: fd })
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.ok) users = data.data;
+			});
+	};
+	updateUsers();
+
+	let grantAdmin = (userID) => {
+		let fd = new FormData();
+		fd.append("target", "grantadmin");
+		fd.append("userid", userID);
+		fetch(SERVER_URL, { method: "post", body: fd })
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.ok) {
+					updateUsers();
 				}
 			});
 	};
@@ -115,7 +142,24 @@
 						</div>
 					{/if}
 				{:else if currTab == "users"}
-					users
+					<span class="text-2xl">Użytkownicy</span>
+					<br />
+					<span class="text-sm">Możesz przyznać uprawnienia administratora użytkownikom standardowym</span>
+					<div class="overflow-y-auto">
+						{#each users as user}
+							<div
+								class="flex flex-col items-start bg-purple-50 hover:bg-purple-100 p-2 rounded-lg m-1 relative sm:flex-row sm:items-center"
+							>
+								<span class="px-2"><b class="font-bold text-purple-700">id:</b> {user.id}</span>
+								<span class="px-2"><b class="font-bold text-purple-700">użytkownik:</b> {user.nick}</span>
+								<span class="px-2"><b class="font-bold text-purple-700">email:</b> {user.email}</span>
+								<i
+									class="fas fa-angle-double-up text-xl text-gray-300 hover:text-purple-700 cursor-pointer absolute right-2"
+									on:click={() => grantAdmin(user.id)}
+								/>
+							</div>
+						{/each}
+					</div>
 				{:else if currTab == "deadlines"}
 					deadlines
 				{:else if currTab == "simtime"}
