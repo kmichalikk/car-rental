@@ -1,6 +1,6 @@
 <script>
 	import { push } from "svelte-spa-router";
-	import { user } from "../stores";
+	import { user, serverTime } from "../stores";
 	import Button from "./Button.svelte";
 	import ListItem from "./ListItem.svelte";
 	import QrCode from "svelte-qrcode";

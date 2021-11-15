@@ -1,12 +1,10 @@
 <script>
-	import { user } from "../stores.js";
+	import { user, serverTime, serverTimeNeedsUpdate } from "../stores.js";
 	import { push } from "svelte-spa-router";
 	import Button from "./Button.svelte";
 	import Loading from "./Loading.svelte";
 	import UserRequestListItem from "./UserRequestListItem.svelte";
-	import ListItem from "./ListItem.svelte";
 	import { SERVER_URL } from "../config";
-	import { dataset_dev } from "svelte/internal";
 	let tabs = ["requests", "users", "deadlines", "simtime"];
 	let currTab = "requests";
 
@@ -53,6 +51,10 @@
 			});
 	};
 
+	//#######################
+	//### zarządzanie userami
+	//#######################
+
 	let users = [];
 	let updateUsers = () => {
 		let fd = new FormData();
@@ -77,6 +79,26 @@
 				}
 			});
 	};
+
+	let newDateTime;
+	let updateTime = () => {
+		let date = new Date(newDateTime);
+		let newTime = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()} ${("0" + date.getHours()).slice(
+			-2
+		)}:00:00`;
+		let fd = new FormData();
+		fd.append("target", "updateservertime");
+		fd.append("datetime", newTime);
+		fetch(SERVER_URL, { method: "post", body: fd })
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.ok) serverTimeNeedsUpdate.set({ needsUpdate: true });
+			});
+	};
+	let fixInputs = () => {
+		// wyrównanie inputów do następnej pełnej godziny
+		newDateTime = newDateTime.slice(0, -2) + "00";
+	};
 </script>
 
 <main class="pt-24 pb-8 px-6 h-full flex justify-center">
@@ -99,73 +121,77 @@
 				text="Wyloguj"
 			/>
 		</div>
-		<div class="flex h-5/6 flex-col overflow-y-hidden">
-			<hr />
-			<div class="flex my-2 flex-wrap">
-				{#each tabs as tab}
-					<div
-						class="m-1 p-1 md:p-2 w-28 md:w-36 rounded-lg shadow-lg box-border flex items-center justify-center text-lg cursor-pointer flex-wrap
+		<hr />
+		<div class="flex my-2 flex-wrap">
+			{#each tabs as tab}
+				<div
+					class="m-1 p-1 md:p-2 w-28 md:w-36 rounded-lg shadow-lg box-border flex items-center justify-center text-lg cursor-pointer flex-wrap
 						{currTab == tab ? 'bg-purple-700 text-white' : 'bg-white border-2 border-purple-500 text-purple-700'}"
-						on:click={() => {
-							currTab = tab;
-						}}
+					on:click={() => {
+						currTab = tab;
+					}}
+				>
+					{tab}
+				</div>
+			{/each}
+		</div>
+		<hr />
+		{#if currTab == "requests"}
+			<span class="text-2xl">Prośby o wypożyczenie użytkowników</span>
+			<br />
+			<span class="text-sm"> System nie przyjmie wypożyczenia zaczynającego się przed aktualną godziną </span>
+			{#if !updating}
+				<div class="overflow-y-auto my-4">
+					{#each Object.keys(userRequests) as key}
+						<span class="text-lg">{key}</span>
+						<hr />
+						{#each userRequests[key] as req}
+							<UserRequestListItem
+								reqid={req.reqID}
+								user={req.userNick}
+								prefStart={req.preferredStart.replace(" ", "T")}
+								prefEnd={req.preferredEnd.replace(" ", "T")}
+								submitFunc={acceptRequest}
+							/>
+						{/each}
+					{/each}
+				</div>
+			{:else}
+				<div class="flex items-center justify-center flex-grow pb-48">
+					<Loading color="#6d28d9" />
+				</div>
+			{/if}
+		{:else if currTab == "users"}
+			<span class="text-2xl">Użytkownicy</span>
+			<br />
+			<span class="text-sm">Możesz przyznać uprawnienia administratora użytkownikom standardowym</span>
+			<div class="overflow-y-auto">
+				{#each users as user}
+					<div
+						class="flex flex-col items-start bg-purple-50 hover:bg-purple-100 p-2 rounded-lg m-1 relative sm:flex-row sm:items-center"
 					>
-						{tab}
+						<span class="px-2"><b class="font-bold text-purple-700">id:</b> {user.id}</span>
+						<span class="px-2"><b class="font-bold text-purple-700">użytkownik:</b> {user.nick}</span>
+						<span class="px-2"><b class="font-bold text-purple-700">email:</b> {user.email}</span>
+						<i
+							class="fas fa-angle-double-up text-xl text-gray-300 hover:text-purple-700 cursor-pointer absolute right-2"
+							on:click={() => grantAdmin(user.id)}
+						/>
 					</div>
 				{/each}
 			</div>
-			<hr />
-			<div class="p-4 flex flex-col flex-grow h-5/6">
-				{#if currTab == "requests"}
-					<span class="text-2xl">Prośby o wypożyczenie użytkowników</span>
-					<br />
-					<span class="text-sm"> System nie przyjmie wypożyczenia zaczynającego się przed aktualną godziną </span>
-					{#if !updating}
-						<div class="overflow-y-auto my-4">
-							{#each Object.keys(userRequests) as key}
-								<span class="text-lg">{key}</span>
-								<hr />
-								{#each userRequests[key] as req}
-									<UserRequestListItem
-										reqid={req.reqID}
-										user={req.userNick}
-										prefStart={req.preferredStart.replace(" ", "T")}
-										prefEnd={req.preferredEnd.replace(" ", "T")}
-										submitFunc={acceptRequest}
-									/>
-								{/each}
-							{/each}
-						</div>
-					{:else}
-						<div class="flex items-center justify-center flex-grow pb-48">
-							<Loading color="#6d28d9" />
-						</div>
-					{/if}
-				{:else if currTab == "users"}
-					<span class="text-2xl">Użytkownicy</span>
-					<br />
-					<span class="text-sm">Możesz przyznać uprawnienia administratora użytkownikom standardowym</span>
-					<div class="overflow-y-auto">
-						{#each users as user}
-							<div
-								class="flex flex-col items-start bg-purple-50 hover:bg-purple-100 p-2 rounded-lg m-1 relative sm:flex-row sm:items-center"
-							>
-								<span class="px-2"><b class="font-bold text-purple-700">id:</b> {user.id}</span>
-								<span class="px-2"><b class="font-bold text-purple-700">użytkownik:</b> {user.nick}</span>
-								<span class="px-2"><b class="font-bold text-purple-700">email:</b> {user.email}</span>
-								<i
-									class="fas fa-angle-double-up text-xl text-gray-300 hover:text-purple-700 cursor-pointer absolute right-2"
-									on:click={() => grantAdmin(user.id)}
-								/>
-							</div>
-						{/each}
-					</div>
-				{:else if currTab == "deadlines"}
-					deadlines
-				{:else if currTab == "simtime"}
-					simtime
-				{/if}
+		{:else if currTab == "deadlines"}
+			deadlines
+		{:else if currTab == "simtime"}
+			<div class="block">
+				<span class="text-2xl">Czas serwera</span>
+				<br /><br />
+				<span class="text-sm">Możesz ustawić tutaj czas serwera</span>
+				<br />
+				<input type="datetime-local" class="m-4" on:change={fixInputs} bind:value={newDateTime} />
+				<br />
+				<Button text="Potwierdź" clickFn={updateTime} />
 			</div>
-		</div>
+		{/if}
 	</div>
 </main>

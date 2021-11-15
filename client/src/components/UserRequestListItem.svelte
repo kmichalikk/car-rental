@@ -1,4 +1,5 @@
 <script>
+	import { serverTime } from "../stores";
 	export let reqid = 0;
 	export let user = "";
 	export let prefStart = "";
@@ -12,7 +13,7 @@
 	let minStartDate = "";
 	let onDateFocus = () => {
 		// dodajemy godzinę, żeby zaokrąglić w górę
-		let date = new Date();
+		let date = new Date($serverTime);
 		minStartDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}T00:00`;
 	};
 	$: startTs = Date.parse(start);
@@ -20,7 +21,7 @@
 	let fixInputs = () => {
 		// wyrównanie inputów do następnej pełnej godziny
 		if (startTs) {
-			if (startTs < Date.now()) startTs = Date.now();
+			if (startTs < $serverTime) startTs = $serverTime;
 			let date = new Date(startTs + 3599000);
 			start = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + date.getDate()).slice(-2)}T${(
 				"0" + date.getHours()

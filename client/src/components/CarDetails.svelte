@@ -1,5 +1,5 @@
 <script>
-	import { user } from "../stores";
+	import { user, serverTime } from "../stores";
 	import { push } from "svelte-spa-router";
 	import Card from "./Card.svelte";
 	import Loading from "./Loading.svelte";
@@ -31,7 +31,7 @@
 	let minStartDate = "";
 	let onDateFocus = () => {
 		// dodajemy godzinę, żeby zaokrąglić w górę
-		let date = new Date();
+		let date = new Date($serverTime);
 		minStartDate = `${date.getFullYear()}-${date.getMonth() + 1}-${date.getDate()}T00:00`;
 	};
 	// update kosztów
@@ -43,7 +43,7 @@
 	let fixInputs = () => {
 		// wyrównanie inputów do następnej pełnej godziny
 		if (startTs) {
-			if (startTs < Date.now()) startTs = Date.now();
+			if (startTs < $serverTime) startTs = $serverTime;
 			let date = new Date(startTs + 3599000);
 			startdtText = `${date.getFullYear()}-${("0" + (date.getMonth() + 1)).slice(-2)}-${("0" + date.getDate()).slice(
 				-2

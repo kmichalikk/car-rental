@@ -1,7 +1,5 @@
 <?php
 
-use JetBrains\PhpStorm\Internal\ReturnTypeContract;
-
 require_once "connect.php";
 require_once "utils.php";
 

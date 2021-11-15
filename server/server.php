@@ -83,12 +83,42 @@ if (isset($_POST["target"])) {
 			logout();
 			echo (json_encode(["ok" => true]));
 			break;
+		case "getservertime":
+			$serverDateTime = getServerDateTime();
+			if ($serverDateTime !== false)
+				echo json_encode(["ok" => true, "time" => $serverDateTime->getTimestamp()]);
+			else
+				echo json_encode(["ok" => false]);
+			break;
+		case "updateservertime":
+			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
+				if (isset($_POST["datetime"]) && date_create_from_format("Y-m-d H:i:s", $_POST["datetime"])) {
+					$updateResult = tryUpdateTime(substr($_POST["datetime"], 0, -5) . "00:00");
+					if ($updateResult->status == "ok") {
+						echo json_encode(["ok" => true]);
+					} else if ($updateResult->status == "dbfail") {
+						http_response_code(500);
+						echo json_encode(["ok" => false, "msg" => $updateResult->additionalInfo]);
+					} else {
+						http_response_code(500);
+						echo json_encode(["ok" => false, "msg" => "unknown error"]);
+					}
+				} else {
+					http_response_code(400);
+					echo json_encode(["ok" => false, "msg" => "bad request"]);
+				}
+			} else {
+				http_response_code(401);
+				echo json_encode(["ok" => false, "msg" => "you must be admin to update time"]);
+			}
+			break;
 		case "requestcar":
+			$serverDateTime = getServerDateTime();
 			if (isset($_SESSION["loggedInUser"])) {
 				$hasAllParams = isset($_POST["carid"]) && intval($_POST["carid"]) > 0 && isset($_POST["startdatetime"]) && isset($_POST["enddatetime"]);
 				$startdt = $hasAllParams ? date_create_from_format("Y-m-d H:i:s", $_POST["startdatetime"]) : false;
 				$enddt = $hasAllParams ? date_create_from_format("Y-m-d H:i:s", $_POST["enddatetime"]) : false;
-				if ($hasAllParams && $startdt && $enddt && $startdt > new DateTime() && $enddt > $startdt) {
+				if ($hasAllParams && $startdt && $enddt && $startdt > $serverDateTime && $enddt > $startdt) {
 					$requestStatus = tryRequestCar(intval($_POST["carid"]), $_SESSION["loggedInUser"]["id"], $_POST["startdatetime"], $_POST["enddatetime"]);
 					if ($requestStatus->status == "ok") {
 						echo (json_encode(["ok" => true]));
@@ -191,12 +221,13 @@ if (isset($_POST["target"])) {
 			}
 			break;
 		case "acceptrequest":
+			$serverDateTime = getServerDateTime();
 			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
 				$hasAllParams = isset($_POST["reqid"]) && intval($_POST["reqid"]) >= 0
 					&& isset($_POST["startdatetime"]) && isset($_POST["enddatetime"]);
 				$startdt = $hasAllParams ? date_create_from_format("Y-m-d H:i:s", $_POST["startdatetime"]) : false;
 				$enddt = $hasAllParams ? date_create_from_format("Y-m-d H:i:s", $_POST["enddatetime"]) : false;
-				if ($hasAllParams && $startdt && $enddt && $startdt > new DateTime() && $enddt > $startdt) {
+				if ($hasAllParams && $startdt && $enddt && $startdt > $serverDateTime && $enddt > $startdt) {
 					$acceptResult = tryAcceptRequest($_POST["reqid"], $_POST["startdatetime"], $_POST["enddatetime"]);
 					if ($acceptResult->status == "ok") {
 						echo (json_encode(["ok" => true]));

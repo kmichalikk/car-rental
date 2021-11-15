@@ -2,6 +2,7 @@
 	import { filters, user } from "./stores";
 	import Router from "svelte-spa-router";
 	import Header from "./components/Header.svelte";
+	import Footer from "./components/Footer.svelte";
 	import Main from "./components/Main.svelte";
 	import NotFound from "./components/NotFound.svelte";
 	import Login from "./components/Login.svelte";
@@ -56,6 +57,7 @@
 
 <Router {routes} />
 <Header />
+<Footer />
 
 <style global lang="postcss">
 	@tailwind base;
