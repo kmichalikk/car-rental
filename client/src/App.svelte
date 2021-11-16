@@ -10,11 +10,13 @@
 	import UserDashboard from "./components/UserDashboard.svelte";
 	import AdminDashboard from "./components/AdminDashboard.svelte";
 	import CarDetails from "./components/CarDetails.svelte";
+	import Pdf from "./components/Pdf.svelte";
 
 	const routes = {
 		"/": Main,
 		"/login": Login,
 		"/register": Register,
+		"/agreement": Pdf,
 		"/userdashboard": UserDashboard,
 		"/admindashboard": AdminDashboard,
 		"/details/:carid": CarDetails,

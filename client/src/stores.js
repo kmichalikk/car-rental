@@ -20,7 +20,7 @@ export const serverTimeNeedsUpdate = writable({needsUpdate: false});
 export const serverTime = readable(0, (set) => {
 	let interval = setInterval(() => {
 		updTime(set);
-	}, 600000)
+	}, 6000)
 	let emergencyInterval = setInterval(() => {
 		if (get(serverTimeNeedsUpdate).needsUpdate) {
 			serverTimeNeedsUpdate.set({needsUpdate: false})

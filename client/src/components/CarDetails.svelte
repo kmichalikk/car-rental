@@ -141,7 +141,12 @@
 											<input type="checkbox" name="agreement" required bind:checked={userAgreed} />
 											<label for="agreement">
 												Przeczytałem i zgadzam się z
-												<span class="text-purple-700 font-bold cursor-pointer">regulaminem</span>
+												<span
+													class="text-purple-700 font-bold cursor-pointer"
+													on:click={() => {
+														push("/agreement");
+													}}>regulaminem</span
+												>
 											</label>
 										</div>
 										<input
