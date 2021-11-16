@@ -16,7 +16,6 @@ if (isset($_POST["target"])) {
 		case "register":
 			if (
 				isset($_POST["nick"])
-				&& false
 				&& isset($_POST["password"])
 				&& strlen($_POST["password"]) >= 8
 				&& preg_match('/.*[a-z].*/', $_POST["password"])

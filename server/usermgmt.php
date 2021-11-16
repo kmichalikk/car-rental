@@ -22,8 +22,9 @@ function registerUser($username, $pass, $email, $accountType)
 	global $conn;
 	$query = $conn->query("SELECT count(*) FROM users WHERE nick = '$username'");
 	if ($query->fetch_row()[0] == 0) {
-		$insertStmt = $conn->prepare("INSERT INTO users VALUES(null, ?, SHA1(?), ?, ?)");
-		$insertStmt->bind_param("sssi", $username, $pass, $email, $accountType);
+		$insertStmt = $conn->prepare("INSERT INTO users VALUES(null, ?, ?, ?, ?, 0)");
+		$hashedPass = password_hash($pass, PASSWORD_DEFAULT);
+		$insertStmt->bind_param("sssi", $username, $hashedPass, $email, $accountType);
 		if ($insertStmt->execute()) {
 			return new ReturnState("ok", null);
 		} else {
@@ -37,15 +38,16 @@ function registerUser($username, $pass, $email, $accountType)
 function tryLogin($username, $pass)
 {
 	global $conn;
-	$stmt = $conn->prepare("SELECT `ID`,`nick`,`type`,`blocked` FROM users WHERE users.nick = ? AND users.password = SHA1(?)");
-	$stmt->bind_param('ss', $username, $pass);
+	$stmt = $conn->prepare("SELECT ID, nick, type, password, blocked FROM users WHERE users.nick = ?");
+	$stmt->bind_param('s', $username);
 	if ($stmt->execute()) {
 		$result = $stmt->get_result();
 		if ($result) {
 			$data = $result->fetch_assoc();
-			if ($data !== null && $data["blocked"] == 0) {
+			$passOK = $data !== null ? password_verify($pass, $data["password"]) : false;
+			if ($passOK && $data["blocked"] == 0) {
 				return new ReturnState("ok", ["id" => $data["ID"], "nick" => $data["nick"], "type" => $data["type"]]);
-			} else if ($data !== null && $data["blocked"] == 1) {
+			} else if ($passOK && $data["blocked"] == 1) {
 				return new ReturnState("loginfail", "blocked");
 			} else {
 				return new ReturnState("loginfail", "wrongpass");
