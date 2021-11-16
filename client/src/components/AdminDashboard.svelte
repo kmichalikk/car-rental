@@ -3,6 +3,7 @@
 	import { push } from "svelte-spa-router";
 	import Button from "./Button.svelte";
 	import Loading from "./Loading.svelte";
+	import Toggle from "./Toggle.svelte";
 	import UserRequestListItem from "./UserRequestListItem.svelte";
 	import { SERVER_URL } from "../config";
 
@@ -34,7 +35,6 @@
 	updateRequests();
 
 	let acceptRequest = (reqid, start, end) => {
-		console.log(reqid, start, end);
 		let fd = new FormData();
 		fd.append("target", "acceptrequest");
 		fd.append("reqid", reqid);
@@ -99,6 +99,26 @@
 	let fixInputs = () => {
 		// wyrównanie inputów do następnej pełnej godziny
 		newDateTime = newDateTime.slice(0, -2) + "00";
+	};
+
+	let schedOn;
+	let updateSchedulerInfo = () => {
+		let fd = new FormData();
+		fd.append("target", "checkscheduler");
+		fetch(SERVER_URL, { method: "post", body: fd })
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.ok) {
+					schedOn = data.state;
+				}
+			});
+	};
+
+	let toggleScheduler = () => {
+		let fd = new FormData();
+		fd.append("target", "setscheduler");
+		fd.append("on", schedOn ? 0 : 1);
+		fetch(SERVER_URL, { method: "post", body: fd }).then(updateSchedulerInfo());
 	};
 
 	//##########################
@@ -177,7 +197,7 @@
 			},
 		},
 		{ name: "deadlines", prettyName: "Przetrzymujący", cmd: updateLateUsers },
-		{ name: "simtime", prettyName: "Czas serwera", cmd: () => {} },
+		{ name: "simtime", prettyName: "Czas serwera", cmd: updateSchedulerInfo },
 	];
 	let currTab = "requests";
 </script>
@@ -317,6 +337,12 @@
 				<input type="datetime-local" class="m-4" on:change={fixInputs} bind:value={newDateTime} />
 				<br />
 				<Button text="Potwierdź" clickFn={updateTime} />
+				<hr class="mt-4" />
+				<span class="text-2xl">Automatyczny upływ czasu</span>
+				<br /> <br />
+				<span class="text-sm">Możesz włączyć lub wyłączyć automatyczny upływ czasu na serwerze (1h co minutę)</span>
+				<br />
+				<Toggle val={schedOn} clickFn={toggleScheduler} />
 			</div>
 		{/if}
 	</div>

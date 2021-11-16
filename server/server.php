@@ -413,6 +413,45 @@ if (isset($_POST["target"])) {
 				echo (json_encode(["ok" => false, "msg" => "you must be admin to get blocked users"]));
 			}
 			break;
+		case "checkscheduler":
+			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
+				$res = checkScheduler();
+				if ($res->status == "ok") {
+					echo json_encode(["ok" => true, "state" => $res->additionalInfo]);
+				} else if ($res->status == "dbfail") {
+					http_response_code(500);
+					echo json_encode(["ok" => false, $res->additionalInfo]);
+				} else {
+					http_response_code(500);
+					echo json_encode(["ok" => false, "unexpected error"]);
+				}
+			} else {
+				http_response_code(401);
+				echo (json_encode(["ok" => false, "msg" => "you must be admin to change scheduler settings"]));
+			}
+			break;
+		case "setscheduler":
+			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
+				if (isset($_POST["on"]) && ctype_digit($_POST["on"])) {
+					$res = $_POST["on"] == 0 ? schedulerOff() : schedulerOn();
+					if ($res->status == "ok") {
+						echo json_encode(["ok" => true]);
+					} else if ($res->status == "dbfail") {
+						http_response_code(500);
+						echo json_encode(["ok" => false, $res->additionalInfo]);
+					} else {
+						http_response_code(500);
+						echo json_encode(["ok" => false, "unexpected error"]);
+					}
+				} else {
+					http_response_code(400);
+					echo json_encode(["ok" => false, "bad request"]);
+				}
+			} else {
+				http_response_code(401);
+				echo (json_encode(["ok" => false, "msg" => "you must be admin to change scheduler settings"]));
+			}
+			break;
 		default:
 			http_response_code(400);
 			echo (json_encode(["ok" => false, "msg" => "missing or wrong target"]));

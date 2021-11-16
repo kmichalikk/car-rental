@@ -30,3 +30,36 @@ function tryUpdateTime($newtime)
 		return new ReturnState("dbfail", $conn->error);
 	}
 }
+
+function checkScheduler()
+{
+	global $conn;
+	$query = $conn->query("SHOW VARIABLES WHERE VARIABLE_NAME='event_scheduler'");
+	if ($query) {
+		return new ReturnState("ok", $query->fetch_row()[1] == 'ON');
+	} else {
+		return new ReturnState("dbfail", $conn->error);
+	}
+}
+
+function schedulerOn()
+{
+	global $conn;
+	$query = $conn->query("SET GLOBAL event_scheduler='ON'");
+	if ($query) {
+		return new ReturnState("ok", null);
+	} else {
+		return new ReturnState("dbfail", $conn->error);
+	}
+}
+
+function schedulerOff()
+{
+	global $conn;
+	$query = $conn->query("SET GLOBAL event_scheduler='OFF'");
+	if ($query) {
+		return new ReturnState("ok", null);
+	} else {
+		return new ReturnState("dbfail", $conn->error);
+	}
+}
