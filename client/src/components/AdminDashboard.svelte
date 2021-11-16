@@ -5,8 +5,6 @@
 	import Loading from "./Loading.svelte";
 	import UserRequestListItem from "./UserRequestListItem.svelte";
 	import { SERVER_URL } from "../config";
-	let tabs = ["requests", "users", "deadlines", "simtime"];
-	let currTab = "requests";
 
 	//############
 	//### requesty
@@ -65,7 +63,6 @@
 				if (data.ok) users = data.data;
 			});
 	};
-	updateUsers();
 
 	let grantAdmin = (userID) => {
 		let fd = new FormData();
@@ -79,6 +76,10 @@
 				}
 			});
 	};
+
+	//########################
+	//### update czasu serwera
+	//########################
 
 	let newDateTime;
 	let updateTime = () => {
@@ -99,6 +100,53 @@
 		// wyrównanie inputów do następnej pełnej godziny
 		newDateTime = newDateTime.slice(0, -2) + "00";
 	};
+
+	//##########################
+	//### zwlekający użytkownicy
+	//##########################
+
+	let lateUsers = [];
+	let updateLateUsers = () => {
+		let fd = new FormData();
+		fd.append("target", "getlate");
+		fetch(SERVER_URL, { method: "post", body: fd })
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.ok) {
+					lateUsers = data.data;
+				}
+			});
+	};
+
+	let forceReturnCar = (bookid) => {
+		let fd = new FormData();
+		fd.append("target", "returncar");
+		fd.append("bookid", bookid);
+		fetch(SERVER_URL, { method: "post", body: fd })
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.ok) updateLateUsers();
+			});
+	};
+
+	let blockUser = (userid) => {
+		let fd = new FormData();
+		fd.append("target", "blockuser");
+		fd.append("userid", userid);
+		fetch(SERVER_URL, { method: "post", body: fd })
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.ok) updateLateUsers();
+			});
+	};
+
+	let tabs = [
+		{ name: "requests", prettyName: "Zgłoszenia", cmd: updateRequests },
+		{ name: "users", prettyName: "Użytkownicy", cmd: updateUsers },
+		{ name: "deadlines", prettyName: "Przetrzymujący", cmd: updateLateUsers },
+		{ name: "simtime", prettyName: "Czas serwera", cmd: () => {} },
+	];
+	let currTab = "requests";
 </script>
 
 <main class="pt-24 pb-8 px-6 h-full flex justify-center">
@@ -126,12 +174,13 @@
 			{#each tabs as tab}
 				<div
 					class="m-1 p-1 md:p-2 w-28 md:w-36 rounded-lg shadow-lg box-border flex items-center justify-center text-lg cursor-pointer flex-wrap
-						{currTab == tab ? 'bg-purple-700 text-white' : 'bg-white border-2 border-purple-500 text-purple-700'}"
+						{currTab == tab.name ? 'bg-purple-700 text-white' : 'bg-white border-2 border-purple-500 text-purple-700'}"
 					on:click={() => {
-						currTab = tab;
+						currTab = tab.name;
+						tab.cmd();
 					}}
 				>
-					{tab}
+					{tab.prettyName}
 				</div>
 			{/each}
 		</div>
@@ -181,7 +230,31 @@
 				{/each}
 			</div>
 		{:else if currTab == "deadlines"}
-			deadlines
+			<span class="text-2xl">Spóźnieni z oddaniem</span>
+			<br />
+			<span class="text-sm mb-2"
+				>Możesz zabrać samochód użytkownikowi, który nie oddał go w wyznaczonym terminie lub zablokować tego użytkownika
+				- wtedy zabierane są mu wszystkie samochody i nie może się logować</span
+			>
+			<div class="overflow-y-auto">
+				{#each lateUsers as user}
+					<div
+						class="flex flex-col items-start bg-purple-50 hover:bg-purple-100 p-2 rounded-lg m-1 relative md:flex-row md:items-center"
+					>
+						<span class="px-2"><b class="font-bold text-purple-700">użytkownik:</b> {user.nick}({user.userid})</span>
+						<span class="px-2"><b class="font-bold text-purple-700">auto:</b> {user.make} {user.model}</span>
+						<span class="px-2"><b class="font-bold text-purple-700">termin:</b> {user.enddate}</span>
+						<i
+							class="fas fa-undo-alt text-lg text-gray-300 hover:text-purple-700 absolute right-2 cursor-pointer"
+							on:click={() => forceReturnCar(user.bookid)}
+						/>
+						<i
+							class="fas fa-user-lock text-lg text-gray-300 hover:text-purple-700 absolute right-8 cursor-pointer"
+							on:click={() => blockUser(user.userid)}
+						/>
+					</div>
+				{/each}
+			</div>
 		{:else if currTab == "simtime"}
 			<div class="block">
 				<span class="text-2xl">Czas serwera</span>

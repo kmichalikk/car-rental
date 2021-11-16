@@ -12,18 +12,32 @@
 	let userBooked = [];
 	let fd = new FormData();
 	let fetching = true;
-	fd.append("target", "mycars");
-	fetch(SERVER_URL, { method: "post", body: fd })
-		.then((res) => res.json())
-		.then((data) => {
-			fetching = false;
-			if (data.ok) {
-				userRequested = data.data.filter((val) => val.requested);
-				userBooked = data.data.filter((val) => val.booked);
-			}
-		});
+	let updateMyCars = () => {
+		fd.append("target", "mycars");
+		fetch(SERVER_URL, { method: "post", body: fd })
+			.then((res) => res.json())
+			.then((data) => {
+				fetching = false;
+				if (data.ok) {
+					userRequested = data.data.filter((val) => val.requested);
+					userBooked = data.data.filter((val) => val.booked);
+				}
+			});
+	};
+	updateMyCars();
 	let showQrCode = "";
 	let qrCodeVal = "";
+
+	let returnCar = (bookid) => {
+		let fd = new FormData();
+		fd.append("target", "returncar");
+		fd.append("bookid", bookid);
+		fetch(SERVER_URL, { method: "post", body: fd })
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.ok) updateMyCars();
+			});
+	};
 </script>
 
 <main class="pt-24 pb-8 px-6 h-full flex justify-center">
@@ -74,6 +88,12 @@
 									on:click={() => {
 										qrCodeVal = car.make + car.model + car.start + car.end;
 										showQrCode = true;
+									}}
+								/>
+								<i
+									class="fas fa-undo-alt relative ml-2 text-2xl hover:text-purple-700 cursor-pointer"
+									on:click={() => {
+										returnCar(car.id);
 									}}
 								/>
 							</div>

@@ -132,14 +132,14 @@ function tryGetUserCars($userID)
 	global $conn;
 	$query = $conn->query("SELECT car_makes.name, cars.model,
 		pending_requests.preferred_start, pending_requests.preferred_end,
-		'1' AS requested, NULL AS booked FROM pending_requests
+		'1' AS requested, NULL AS booked, pending_requests.ID FROM pending_requests
 		INNER JOIN cars ON pending_requests.carID = cars.ID
 		INNER JOIN car_makes ON cars.makeID = car_makes.ID
 		WHERE pending_requests.userID=$userID
 		UNION ALL
 		SELECT car_makes.name, cars.model,
 		curr_booked.borrow_start, curr_booked.borrow_end,
-		NULL AS requested, '1' AS booked FROM curr_booked
+		NULL AS requested, '1' AS booked, curr_booked.ID FROM curr_booked
 		INNER JOIN cars ON curr_booked.carID = cars.ID
 		INNER JOIN car_makes ON cars.makeID = car_makes.ID
 		WHERE curr_booked.userID=$userID;");
@@ -151,7 +151,8 @@ function tryGetUserCars($userID)
 				"start" => $val[2],
 				"end" => $val[3],
 				"requested" => $val[4] == '1',
-				"booked" => $val[5] == '1'
+				"booked" => $val[5] == '1',
+				"id" => $val[6]
 			];
 		}, $query->fetch_all());
 		return new ReturnState("ok", $cars);
@@ -200,6 +201,60 @@ function tryAcceptRequest($reqID, $startdt, $enddt)
 		} else {
 			return new ReturnState("nonexistent", null);
 		}
+	} else {
+		return new ReturnState("dbfail", $conn->error);
+	}
+}
+
+function tryGetLateUsers()
+{
+	global $conn;
+	$query = $conn->query("SELECT car_makes.name, cars.model, curr_booked.userID, users.nick, curr_booked.borrow_end, curr_booked.ID
+	FROM curr_booked
+	INNER JOIN cars ON curr_booked.carID = cars.ID
+	INNER JOIN car_makes ON cars.makeID = car_makes.ID
+	INNER JOIN users ON curr_booked.userID = users.ID
+	WHERE borrow_end < (SELECT time FROM curr_time LIMIT 1);");
+	if ($query) {
+		$queryRes = $query->fetch_all();
+		$parsed = [];
+		foreach ($queryRes as $row) {
+			$parsed[] = [
+				"make" => $row[0],
+				"model" => $row[1],
+				"userid" => $row[2],
+				"nick" => $row[3],
+				"enddate" => $row[4],
+				"bookid" => $row[5]
+			];
+		}
+		return new ReturnState("ok", $parsed);
+	} else {
+		return new ReturnState("dbfail", $conn->error);
+	}
+}
+
+function tryReturnCarRestricted($userid, $bookid)
+{
+	global $conn;
+	$query = $conn->query("SELECT userID from curr_booked WHERE ID = $bookid");
+	if ($query) {
+		if ($query->num_rows > 0 && $query->fetch_row()[0] == $userid) {
+			return tryReturnCar($bookid);
+		} else {
+			return new ReturnState("nonexistent", null);
+		}
+	} else {
+		return new ReturnState("dbfail", $conn->error);
+	}
+}
+
+function tryReturnCar($bookid)
+{
+	global $conn;
+	$delQuery = $conn->query("DELETE FROM curr_booked WHERE ID=$bookid");
+	if ($delQuery) {
+		return new ReturnState("ok", null);
 	} else {
 		return new ReturnState("dbfail", $conn->error);
 	}

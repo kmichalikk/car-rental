@@ -37,16 +37,18 @@ function registerUser($username, $pass, $email, $accountType)
 function tryLogin($username, $pass)
 {
 	global $conn;
-	$stmt = $conn->prepare("SELECT `ID`,`nick`,`type` FROM users WHERE users.nick = ? AND users.password = SHA1(?)");
+	$stmt = $conn->prepare("SELECT `ID`,`nick`,`type`,`blocked` FROM users WHERE users.nick = ? AND users.password = SHA1(?)");
 	$stmt->bind_param('ss', $username, $pass);
 	if ($stmt->execute()) {
 		$result = $stmt->get_result();
 		if ($result) {
 			$data = $result->fetch_assoc();
-			if (isset($data["ID"])) {
+			if ($data !== null && $data["blocked"] == 0) {
 				return new ReturnState("ok", ["id" => $data["ID"], "nick" => $data["nick"], "type" => $data["type"]]);
+			} else if ($data !== null && $data["blocked"] == 1) {
+				return new ReturnState("loginfail", "blocked");
 			} else {
-				return new ReturnState("loginfail", null);
+				return new ReturnState("loginfail", "wrongpass");
 			}
 		} else {
 			return new ReturnState("dbfail", $conn->error);
@@ -108,4 +110,30 @@ function tryGrantAdmin($userid)
 	} else {
 		return new ReturnState("dbfail", $conn->error);
 	}
+}
+
+function tryBlockUser($userid)
+{
+	global $conn;
+	$query = $conn->query("BEGIN");
+	if (!$query) {
+		return new ReturnState("dbfail", $conn->error);
+	}
+	$query = $conn->query("UPDATE users SET blocked=1 WHERE ID=$userid");
+	if (!$query) {
+		$query = $conn->query("ROLLBACK");
+		return new ReturnState("dbfail", $conn->error);
+	}
+	$query = $conn->query("DELETE FROM curr_booked WHERE userID=$userid");
+	if (!$query) {
+		$query = $conn->query("ROLLBACK");
+		return new ReturnState("dbfail", $conn->error);
+	}
+	$query = $conn->query("DELETE FROM pending_requests WHERE userID=$userid");
+	if (!$query) {
+		$query = $conn->query("ROLLBACK");
+		return new ReturnState("dbfail", $conn->error);
+	}
+	$query = $conn->query("COMMIT");
+	return new ReturnState("ok", null);
 }

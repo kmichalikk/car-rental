@@ -69,7 +69,7 @@ if (isset($_POST["target"])) {
 					echo (json_encode(["ok" => true, "type" => $loginStatus->additionalInfo["type"] == ACCOUNT_ADMIN ? "admin" : "user"]));
 				} else if ($loginStatus->status == "loginfail") {
 					http_response_code(401);
-					echo (json_encode(["ok" => false, "msg" => "unauthorized: wrong password"]));
+					echo (json_encode(["ok" => false, "msg" => $loginStatus->additionalInfo]));
 				} else if ($loginStatus->status == "dbfail") {
 					http_response_code(500);
 					echo (json_encode(["ok" => false, "msg" => $loginStatus->additionalInfo]));
@@ -267,6 +267,58 @@ if (isset($_POST["target"])) {
 				echo (json_encode(["ok" => false, "msg" => "you must be admin to list users"]));
 			}
 			break;
+		case "getlate":
+			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
+				$lateResult = tryGetLateUsers();
+				if ($lateResult->status == "ok") {
+					echo json_encode(["ok" => true, "data" => $lateResult->additionalInfo]);
+				} else if ($lateResult->status == "dbfail") {
+					http_response_code(500);
+					echo json_encode(["ok" => false, "msg" => $lateResult->additionalInfo]);
+				} else {
+					http_response_code(500);
+					echo json_encode(["ok" => false, "msg" => "unknown error"]);
+				}
+			} else {
+				http_response_code(401);
+				echo (json_encode(["ok" => false, "msg" => "you must be logged as admin to list late users"]));
+			}
+			break;
+		case "returncar":
+			if (isset($_POST["bookid"]) && ctype_digit($_POST["bookid"])) {
+				if (isset($_SESSION["loggedInUser"])) {
+					$ret;
+					if ($_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
+						$ret = tryReturnCar($_POST["bookid"]);
+					} else if ($_SESSION["loggedInUser"]["type"] == ACCOUNT_USER) {
+						$ret = tryReturnCarRestricted($_SESSION["loggedInUser"]["id"], $_POST["bookid"]);
+					}
+					switch ($ret->status) {
+						case "ok":
+							echo json_encode(["ok" => true]);
+							break;
+						case "dbfail":
+							http_response_code(500);
+							echo json_encode(["ok" => false, "msg" => $ret->additionalInfo]);
+							break;
+						case "nonexistent":
+							http_response_code(404);
+							echo json_encode(["ok" => false, "msg" => "nonexistent"]);
+							break;
+						default:
+							http_response_code(500);
+							echo json_encode(["ok" => false, "msg" => "unknown error"]);
+							break;
+					}
+				} else {
+					http_response_code(401);
+					echo json_encode(["ok" => false, "msg" => "you must be logged in"]);
+				}
+			} else {
+				http_response_code(400);
+				echo json_encode(["ok" => false, "msg" => "bad request"]);
+			}
+			break;
 		case "grantadmin":
 			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
 				if (isset($_POST["userid"]) && ctype_digit($_POST["userid"]) == true) {
@@ -299,6 +351,28 @@ if (isset($_POST["target"])) {
 			} else {
 				http_response_code(401);
 				echo (json_encode(["ok" => false, "msg" => "you must be admin to grant admin access to users"]));
+			}
+			break;
+		case "blockuser":
+			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
+				if (isset($_POST["userid"]) && ctype_digit($_POST["userid"])) {
+					$blockResult = tryBlockUser($_POST["userid"]);
+					if ($blockResult->status == "ok") {
+						echo json_encode(["ok" => true]);
+					} else if ($blockResult->status == "dbfail") {
+						http_response_code(500);
+						echo json_encode(["ok" => false, "msg" => $blockResult->additionalInfo]);
+					} else {
+						http_response_code(500);
+						echo json_encode(["ok" => false, "msg" => "unknown error"]);
+					}
+				} else {
+					http_response_code(400);
+					echo json_encode(["ok" => false, "msg" => "bad request"]);
+				}
+			} else {
+				http_response_code(401);
+				echo (json_encode(["ok" => false, "msg" => "you must be admin to block users"]));
 			}
 			break;
 		default:

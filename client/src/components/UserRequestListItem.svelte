@@ -73,7 +73,7 @@
 		/>
 	</div>
 	<i
-		class="text-lg text-gray-300 hover:text-purple-700 fas fa-undo-alt absolute right-8 cursor-pointer"
+		class="text-lg text-gray-300 hover:text-purple-700 fas fa-eraser absolute right-8 cursor-pointer"
 		on:click={() => {
 			start = prefStart;
 			end = prefEnd;
