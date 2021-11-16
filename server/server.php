@@ -114,7 +114,7 @@ if (isset($_POST["target"])) {
 			break;
 		case "requestcar":
 			$serverDateTime = getServerDateTime();
-			if (isset($_SESSION["loggedInUser"])) {
+			if (isset($_SESSION["loggedInUser"]) && !isUserBlocked($_SESSION["loggedInUser"]["id"])) {
 				$hasAllParams = isset($_POST["carid"]) && intval($_POST["carid"]) > 0 && isset($_POST["startdatetime"]) && isset($_POST["enddatetime"]);
 				$startdt = $hasAllParams ? date_create_from_format("Y-m-d H:i:s", $_POST["startdatetime"]) : false;
 				$enddt = $hasAllParams ? date_create_from_format("Y-m-d H:i:s", $_POST["enddatetime"]) : false;
@@ -187,7 +187,7 @@ if (isset($_POST["target"])) {
 			}
 			break;
 		case "mycars":
-			if (isset($_SESSION["loggedInUser"])) {
+			if (isset($_SESSION["loggedInUser"]) && !isUserBlocked($_SESSION["loggedInUser"]["id"])) {
 				$getResult = tryGetUserCars($_SESSION["loggedInUser"]["id"]);
 				if ($getResult->status == "ok") {
 					echo (json_encode(["ok" => true, "data" => $getResult->additionalInfo]));
@@ -373,6 +373,45 @@ if (isset($_POST["target"])) {
 			} else {
 				http_response_code(401);
 				echo (json_encode(["ok" => false, "msg" => "you must be admin to block users"]));
+			}
+			break;
+		case "unblockuser":
+			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
+				if (isset($_POST["userid"]) && ctype_digit($_POST["userid"])) {
+					$unblockResult = tryUnblockUser($_POST["userid"]);
+					if ($unblockResult->status == "ok") {
+						echo json_encode(["ok" => true]);
+					} else if ($unblockResult->status == "dbfail") {
+						http_response_code(500);
+						echo json_encode(["ok" => false, "msg" => $unblockResult->additionalInfo]);
+					} else {
+						http_response_code(500);
+						echo json_encode(["ok" => false, "msg" => "unknown error"]);
+					}
+				} else {
+					http_response_code(400);
+					echo json_encode(["ok" => false, "msg" => "bad request"]);
+				}
+			} else {
+				http_response_code(401);
+				echo (json_encode(["ok" => false, "msg" => "you must be admin to block users"]));
+			}
+			break;
+		case "getblocked":
+			if (isset($_SESSION["loggedInUser"]) && $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN) {
+				$getResult = tryGetBlockedUsers();
+				if ($getResult->status == "ok") {
+					echo json_encode(["ok" => true, "data" => $getResult->additionalInfo]);
+				} else if ($getResult->status == "dbfail") {
+					http_response_code(500);
+					echo json_encode(["ok" => false, "msg" => $getResult->additionalInfo]);
+				} else {
+					http_response_code(500);
+					echo json_encode(["ok" => false, "msg" => "unknown error"]);
+				}
+			} else {
+				http_response_code(401);
+				echo (json_encode(["ok" => false, "msg" => "you must be admin to get blocked users"]));
 			}
 			break;
 		default:

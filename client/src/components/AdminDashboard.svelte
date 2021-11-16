@@ -140,9 +140,42 @@
 			});
 	};
 
+	//###########################
+	//### zablokowani użytkownicy
+	//###########################
+
+	let blockedUsers = [];
+	let updateBlockedUsers = () => {
+		let fd = new FormData();
+		fd.append("target", "getblocked");
+		fetch(SERVER_URL, { method: "post", body: fd })
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.ok) blockedUsers = data.data;
+			});
+	};
+
+	let unblockUser = (userid) => {
+		let fd = new FormData();
+		fd.append("target", "unblockuser");
+		fd.append("userid", userid);
+		fetch(SERVER_URL, { method: "post", body: fd })
+			.then((res) => res.json())
+			.then((data) => {
+				if (data.ok) updateBlockedUsers();
+			});
+	};
+
 	let tabs = [
 		{ name: "requests", prettyName: "Zgłoszenia", cmd: updateRequests },
 		{ name: "users", prettyName: "Użytkownicy", cmd: updateUsers },
+		{
+			name: "blocked",
+			prettyName: "Blokowani",
+			cmd: () => {
+				updateBlockedUsers();
+			},
+		},
 		{ name: "deadlines", prettyName: "Przetrzymujący", cmd: updateLateUsers },
 		{ name: "simtime", prettyName: "Czas serwera", cmd: () => {} },
 	];
@@ -225,6 +258,26 @@
 						<i
 							class="fas fa-angle-double-up text-xl text-gray-300 hover:text-purple-700 cursor-pointer absolute right-2"
 							on:click={() => grantAdmin(user.id)}
+						/>
+					</div>
+				{/each}
+			</div>
+		{:else if currTab == "blocked"}
+			<span class="text-2xl">Zablokowani użytkownicy</span>
+			<br />
+			<span class="text-sm mb-2">Możesz odblokować zablokowanych użytkowników</span>
+			<div class="overflow-y-auto">
+				{#each blockedUsers as user}
+					<div
+						class="flex flex-col items-start bg-purple-50 hover:bg-purple-100 p-2 rounded-lg m-1 relative md:flex-row md:items-center"
+					>
+						<span class="px-2"><b class="font-bold text-purple-700">użytkownik:</b> {user.nick}({user.id})</span>
+						<span class="px-2"><b class="font-bold text-purple-700">email:</b> {user.email}</span>
+						<i
+							class="fas fa-unlock-alt text-lg text-gray-300 hover:text-purple-700 absolute right-2 cursor-pointer"
+							on:click={() => {
+								unblockUser(user.id);
+							}}
 						/>
 					</div>
 				{/each}

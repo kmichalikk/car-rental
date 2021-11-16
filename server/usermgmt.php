@@ -137,3 +137,47 @@ function tryBlockUser($userid)
 	$query = $conn->query("COMMIT");
 	return new ReturnState("ok", null);
 }
+
+function tryUnblockUser($userid)
+{
+	global $conn;
+	$query = $conn->query("UPDATE users SET blocked=0 WHERE ID=$userid");
+	if ($query) {
+		if ($conn->affected_rows > 0) {
+			return new ReturnState("ok", null);
+		} else {
+			return new ReturnState("nonexistent", null);
+		}
+	} else {
+		return new ReturnState("dbfail", $conn->error);
+	}
+}
+
+function tryGetBlockedUsers()
+{
+	global $conn;
+	$query = $conn->query("SELECT ID, nick, email FROM users WHERE blocked=1");
+	if ($query) {
+		$parsed = [];
+		foreach ($query->fetch_all() as $row) {
+			$parsed[] = [
+				"id" => $row[0],
+				"nick" => $row[1],
+				"email" => $row[2]
+			];
+		}
+		return new ReturnState("ok", $parsed);
+	} else {
+		return new ReturnState("dbfail", $conn->error);
+	}
+}
+
+function isUserBlocked($userid)
+{
+	global $conn;
+	$query = $conn->query("SELECT blocked FROM users WHERE ID=$userid");
+	if ($query && $query->num_rows > 0 && $query->fetch_row()[0] == 1)
+		return true;
+	else
+		return false;
+}
