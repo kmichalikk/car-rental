@@ -1,1 +1,1 @@
-export let SERVER_URL = "../../server/server.php";
+export let SERVER_URL = "server/server.php";
