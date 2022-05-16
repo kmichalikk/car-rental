@@ -8,6 +8,7 @@ header("Access-Control-Allow-Origin: *");
 if (isset($_POST["target"])) {
 	switch ($_POST["target"]) {
 		case "hello":
+			http_response_code(200);
 			if (isset($_SESSION["loggedInUser"]))
 				echo json_encode(["ok" => true, "nick" => $_SESSION["loggedInUser"]["nick"], "type" => $_SESSION["loggedInUser"]["type"] == ACCOUNT_ADMIN ? "admin" : "user"]);
 			else

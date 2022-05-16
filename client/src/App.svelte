@@ -11,6 +11,7 @@
 	import AdminDashboard from "./components/AdminDashboard.svelte";
 	import CarDetails from "./components/CarDetails.svelte";
 	import Pdf from "./components/Pdf.svelte";
+import { SERVER_URL } from "./config";
 
 	const routes = {
 		"/": Main,
@@ -25,7 +26,7 @@
 	// próba logowania
 	let fd = new FormData();
 	fd.append("target", "hello");
-	fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+	fetch(SERVER_URL, { method: "post", body: fd })
 		.then((res) => res.json())
 		.then((data) => {
 			if (data.ok) user.set({ loggedIn: true, nick: data.nick, type: data.type });
@@ -34,7 +35,7 @@
 	// próba pobrania filtrów
 	let fd2 = new FormData();
 	fd.append("target", "getfilters");
-	fetch("http://localhost:8080/carRental/server/server.php", { method: "post", body: fd })
+	fetch(SERVER_URL, { method: "post", body: fd })
 		.then((res) => res.json())
 		.then((json) => {
 			if (json.ok)
