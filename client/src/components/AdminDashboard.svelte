@@ -204,6 +204,7 @@
 
 <main class="pt-24 pb-8 px-6 h-full flex justify-center">
 	<div class="rounded-lg shadow-lg h-full px-4 w-full lg:w-4/5 xl:w-3/4 bg-white flex flex-col overflow-y-hidden">
+		{#if $user.loggedIn && $user.type == "admin"}
 		<div class="w-full h-16 flex items-center justify-between">
 			<span class="text-lg md:text-3xl">Dashboard <span class="hidden sm:inline"> - Panel administratora</span></span>
 			<Button
@@ -343,6 +344,12 @@
 				<span class="text-sm">Możesz włączyć lub wyłączyć automatyczny upływ czasu na serwerze (1h co minutę)</span>
 				<br />
 				<Toggle val={schedOn} clickFn={toggleScheduler} />
+			</div>
+		{/if}
+		{:else}
+			<div class="flex justify-center items-center flex-col h-2/3">
+				<i class="fas fa-exclamation-triangle fa-10x text-red-500" />
+				<span class="mt-12 text-xl">Nie masz dostępu do tego panelu</span>
 			</div>
 		{/if}
 	</div>
