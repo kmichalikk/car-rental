@@ -9,7 +9,6 @@
 	// pobranie listy samochodów
 	let serverResponded = false;
 	let success = true;
-	let errorMessage = "";
 	let allCars = [];
 	let fd = new FormData();
 	fd.append("target", "getcars");
@@ -23,10 +22,9 @@
 			success = true;
 			allCars = data.data;
 		})
-		.catch((err) => {
+		.catch(() => {
 			serverResponded = true;
 			success = false;
-			errorMessage = err;
 		});
 
 	$: filterCarsProm = new Promise((resolve) => {
@@ -137,8 +135,7 @@
 		{:else}
 			<div class="h-2/3 flex items-center justify-center flex-col">
 				<Loading />
-				<span class="text-white">Wystąpił błąd podczas pobierania danych:<br /></span>
-				<span class="text-white">{errorMessage}</span>
+				<span class="text-white">Wystąpił błąd podczas pobierania danych<br /></span>
 			</div>
 		{/if}
 	</div>
