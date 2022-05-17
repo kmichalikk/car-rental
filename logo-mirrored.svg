@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="24"
+   height="10"
+   viewBox="0 0 24 10"
+   version="1.1"
+   id="svg5"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
+   sodipodi:docname="logo-mirrored.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview7"
+     pagecolor="#ffffff"
+     bordercolor="#999999"
+     borderopacity="1"
+     inkscape:pageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="0"
+     inkscape:document-units="px"
+     showgrid="false"
+     inkscape:snap-global="false"
+     inkscape:zoom="33.139261"
+     inkscape:cx="8.6000711"
+     inkscape:cy="8.6302468"
+     inkscape:current-layer="layer1"
+     units="px"
+     height="100px"
+     fit-margin-top="0"
+     fit-margin-left="0"
+     fit-margin-right="0"
+     fit-margin-bottom="0"
+     borderlayer="false" />
+  <defs
+     id="defs2" />
+  <g
+     inkscape:label="Warstwa 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       style="fill:none;stroke:#6d28d9;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="M 12.959049,0.9642675 H 8.0296851 l -1.370144,2.480313 5.2591509,0.02128 0.715303,-1.5955"
+       id="car-window-front"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:none;stroke:#6d28d9;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 11.556859,4.3007525 -10.1256719,0.01603 -0.01452,2.810632 h 7.000465 v -1.880459"
+       id="car-body-front"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:none;stroke:#6d28d9;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 9.4041281,7.1454285 1.0862479,-0.02453 c 0.276038,-0.834774 0.732343,-1.322426 1.434964,-1.339222 0.889997,-0.01421 1.366626,0.738872 1.533753,1.354089 l 4.477732,-0.036777 c 0.158941,-0.744281 0.621951,-1.332173 1.431386,-1.336701 0.919408,-0.00383 1.33651,0.770132 1.45328,1.327113 l 1.761842,0.01304 -0.02478,-2.785664 H 19.959743 L 18.324926,0.9642685 H 13.93547"
+       id="car-body-back"
+       sodipodi:nodetypes="cccccccccccc" />
+    <path
+       style="fill:none;stroke:#6d28d9;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 18.950204,4.3167805 -1.229723,-2.458266 h -1.401265 l -0.0064,2.458267 h 1.677635"
+       id="car-window-1"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       style="fill:none;stroke:#6d28d9;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 15.440516,4.3167805 0.02112,-2.458266 h -1.751623 l -1.061299,2.458267 h 1.946234"
+       id="car-window-2"
+       sodipodi:nodetypes="ccccc" />
+    <path
+       id="car-headlamp-1"
+       style="fill:#cccccc;fill-opacity:0;stroke:#6d28d9;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 6.4041861,5.6974695 a -0.55758486,0.55758486 0 0 0 0.557586,0.557585 -0.55758486,0.55758486 0 0 0 0.557583,-0.557585 -0.55758486,0.55758486 0 0 0 -0.557583,-0.557585 -0.55758486,0.55758486 0 0 0 -0.557586,0.557585 z" />
+    <path
+       id="car-headlamp-2"
+       style="fill:#cccccc;fill-opacity:0;stroke:#6d28d9;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 2.3058851,5.6974695 a -0.55758486,0.55758486 0 0 0 0.557585,0.557585 -0.55758486,0.55758486 0 0 0 0.557583,-0.557585 -0.55758486,0.55758486 0 0 0 -0.557583,-0.557585 -0.55758486,0.55758486 0 0 0 -0.557585,0.557585 z" />
+    <path
+       id="car-wheel-back"
+       style="fill:#cccccc;fill-opacity:0;stroke:#6d28d9;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 18.624121,7.8075935 a -0.7590323,1.2281402 0 0 0 0.759033,1.228139 -0.7590323,1.2281402 0 0 0 0.759032,-1.228139 -0.7590323,1.2281402 0 0 0 -0.759032,-1.228142 -0.7590323,1.2281402 0 0 0 -0.759033,1.228142 z" />
+    <path
+       id="car-wheel-front"
+       style="fill:#cccccc;fill-opacity:0;stroke:#6d28d9;stroke-width:0.529167;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       d="m 11.201142,7.8075935 a -0.7590323,1.2281402 0 0 0 0.759032,1.228139 -0.7590323,1.2281402 0 0 0 0.759033,-1.228139 -0.7590323,1.2281402 0 0 0 -0.759033,-1.228142 -0.7590323,1.2281402 0 0 0 -0.759032,1.228142 z" />
+  </g>
+</svg>
