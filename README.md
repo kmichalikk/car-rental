@@ -1,36 +1,24 @@
 # Projekt wypożyczalni samochodów
 
-<img src="./logo.svg" width="16%"/>
-<img src="./logo.svg" width="16%"/>
-<img src="./logo.svg" width="16%"/>
-<img src="./logo.svg" width="16%"/>
-<img src="./logo.svg" width="16%"/>
+<img src="./logo.svg" width="16%"/><img src="./logo.svg" width="16%"/><img src="./logo.svg" width="16%"/><img src="./logo.svg" width="16%"/><img src="./logo.svg" width="16%"/>
 
-**Rent'n'drive** to prosty serwis, na którym można wypożyczyć samochody na ustalony czas i dostać wycenę, ile takie wypożyczenie może kosztować. Aby dokonać rezerwacji samochodu należy się zarejestrować a następnie zalogować.
+**Rent'n'drive** to prosty serwis, na którym można wypożyczyć samochody na ustalony czas i dostać wycenę, ile takie wypożyczenie może kosztować. Aby dokonać rezerwacji samochodu należy się zarejestrować, a następnie zalogować.
 
-Ostateczny termin rezerwacji może zostać zmieniony przez administratora serwisu; użytkownik może zobaczyć kiedy jego samochód będzie dla niego dostępny.
+Ostateczny termin rezerwacji może zostać zmieniony przez administratora serwisu; użytkownik może ten termin zobaczyć na swoim panelu użytkownika.
 
 Obowiązkiem użytkownika jest zwrócenie samochodu zanim upłynie czas rezerwacji - jeśli tego nie zrobi, samochód zostanie odebrany mu przez administratora, a użytkownik może zostać za karę zablokowany.
 
 Wszystkie te operacje są symboliczne - sprowadzają się do kliknięcia odpowiedniego przycisku.
 
-<img src="./logo-mirrored.svg" width="16%"/>
-<img src="./logo-mirrored.svg" width="16%"/>
-<img src="./logo-mirrored.svg" width="16%"/>
-<img src="./logo-mirrored.svg" width="16%"/>
-<img src="./logo-mirrored.svg" width="16%"/>
+<img src="./logo-mirrored.svg" width="16%"/><img src="./logo-mirrored.svg" width="16%"/><img src="./logo-mirrored.svg" width="16%"/><img src="./logo-mirrored.svg" width="16%"/><img src="./logo-mirrored.svg" width="16%"/>
 
 ## Wykorzystane technologie
 
-Front-end został przygotowany z wykorzystaniem frameworku `Svelte`. Po stronie serwerowej pracuje `Apache`; język backendowy to `PHP`. Współpracuje z `bazą danych SQL mariadb`. Całość można uruchomić lokalnie za pomocą `dockera` i skryptu `basha`, który buduje i uruchamia potrzebne kontenery.
+Front-end został przygotowany z wykorzystaniem frameworka `Svelte`. Po stronie serwerowej pracuje `Apache`; język backendowy to `PHP`. Współpracuje z `bazą danych SQL mariadb`. Całość można uruchomić lokalnie za pomocą `dockera` i skryptu `basha`, który buduje i uruchamia potrzebne kontenery.
 
-Całość została sprawdzona na nowej przeglądarce Edge, a co za tym idzie, aplikacja powinna działać na przeglądarkach opartych na Chromium.
+Projekt został sprawdzony na nowej przeglądarce Edge, a co za tym idzie aplikacja powinna działać na przeglądarkach opartych na Chromium.
 
-<img src="./logo.svg" width="16%"/>
-<img src="./logo.svg" width="16%"/>
-<img src="./logo.svg" width="16%"/>
-<img src="./logo.svg" width="16%"/>
-<img src="./logo.svg" width="16%"/>
+<img src="./logo.svg" width="16%"/><img src="./logo.svg" width="16%"/><img src="./logo.svg" width="16%"/><img src="./logo.svg" width="16%"/><img src="./logo.svg" width="16%"/>
 
 ## Uwagi
 
@@ -46,11 +34,7 @@ Całość została sprawdzona na nowej przeglądarce Edge, a co za tym idzie, a
    - admin
    - user
 
-<img src="./logo-mirrored.svg" width="16%"/>
-<img src="./logo-mirrored.svg" width="16%"/>
-<img src="./logo-mirrored.svg" width="16%"/>
-<img src="./logo-mirrored.svg" width="16%"/>
-<img src="./logo-mirrored.svg" width="16%"/>
+<img src="./logo-mirrored.svg" width="16%"/><img src="./logo-mirrored.svg" width="16%"/><img src="./logo-mirrored.svg" width="16%"/><img src="./logo-mirrored.svg" width="16%"/><img src="./logo-mirrored.svg" width="16%"/>
 
 ## Opis funkcjonalności
 
@@ -79,5 +63,5 @@ Adminstrator ma dostęp do różnych funkcji zarządzania rezerwacjami i użytko
 - W Zgłoszeniach może wybrać zgłoszenie do przyjęcia i ewentualnie edytować ich termin (edycję można wyczyścić, klikając symbol gumki).
 - W zakładce użytkownicy może promować wybranego użytkownika do roli administratora.
 - W zakładce Blokowani może zobaczyć blokowanych użytkowników i ich odblokować.
-- Przetrzymujący to zakładka, gdzie pojawiają się osoby, które nie oddały przed upływem terminu samochodu. Tam można zabrać im samochód lub zablokować użytkownika - wtedy automatycznie traci wszystkie wypożyczenia.
-- Czas serwera to zakładka, gdzie można zmienić dzień i godzinę i włączyć lub wyłączyć automatyczny upływ czasu.
+- Zakładka Przetrzymujący to miejsce, gdzie pojawiają się osoby, które nie oddały przed upływem terminu samochodu. Tam można zabrać im samochód lub zablokować użytkownika - wtedy automatycznie traci wszystkie wypożyczenia.
+- Czas serwera to zakładka, gdzie można zmienić dzień i godzinę oraz włączyć lub wyłączyć automatyczny upływ czasu.
