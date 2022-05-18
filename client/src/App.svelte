@@ -58,6 +58,10 @@ import { SERVER_URL } from "./config";
 		.catch((err) => console.log(err));
 </script>
 
+<svelte:head>
+	<title>Rent'n'Drive</title>
+</svelte:head>
+
 <Router {routes} />
 <Header />
 <Footer />
