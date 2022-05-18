@@ -152,6 +152,7 @@
 										<input
 											type="submit"
 											value="Rejestruję się"
+											disabled={ startdtText == "" || enddtText == "" || !userAgreed}
 											class="{totalCost > 0 && userAgreed
 												? 'bg-purple-700 cursor-pointer'
 												: 'bg-gray-500'} p-2 w-2/5 mt-2 rounded-md shadow-md text-white text-lg"
